@@ -1,18 +1,18 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="432" height="432" viewBox="0 0 432 432">
   <defs>
     <linearGradient id="body" x1="0" x2="0" y1="0" y2="1">
-      <stop offset="0" stop-color="#f2feff"/>
-      <stop offset="0.45" stop-color="#7cc4ff"/>
-      <stop offset="1" stop-color="#2456c9"/>
+      <stop offset="0" stop-color="#f6feff"/>
+      <stop offset="0.45" stop-color="#8fe6ff"/>
+      <stop offset="1" stop-color="#5c3fc9"/>
     </linearGradient>
     <radialGradient id="cockpit" cx="38%" cy="30%" r="75%">
-      <stop offset="0" stop-color="#eafcff"/>
-      <stop offset="0.4" stop-color="#8fe3ff"/>
-      <stop offset="1" stop-color="#061421"/>
+      <stop offset="0" stop-color="#f2feff"/>
+      <stop offset="0.4" stop-color="#6be8ff"/>
+      <stop offset="1" stop-color="#0a1030"/>
     </radialGradient>
     <linearGradient id="flame" x1="0" x2="0" y1="0" y2="1">
       <stop offset="0" stop-color="#ffe98a"/>
-      <stop offset="1" stop-color="#ff5b32"/>
+      <stop offset="1" stop-color="#7c5cff"/>
     </linearGradient>
   </defs>
 
@@ -22,8 +22,8 @@
   <circle cx="216" cy="176" r="34" fill="url(#cockpit)" stroke="#e5faff" stroke-width="8"/>
   <ellipse cx="203" cy="163" rx="11" ry="7" fill="#ffffff" opacity="0.75" transform="rotate(-28 203 163)"/>
 
-  <circle cx="340" cy="250" r="9" fill="#3bffb0"/>
-  <circle cx="92" cy="250" r="9" fill="#3bffb0"/>
+  <circle cx="340" cy="250" r="9" fill="#ffcf6b"/>
+  <circle cx="92" cy="250" r="9" fill="#ffcf6b"/>
 
   <path d="M198 302 C202 316 208 328 216 340 C224 328 230 316 234 302 C226 308 206 308 198 302 Z" fill="url(#flame)"/>
 </svg>

@@ -130,24 +130,26 @@ const ZONE_THEMES: Array[Dictionary] = [
 ]
 
 # ---------------------------------------------------------------------------
-# Modern UI color palette
+# Modern UI color palette -- "Aurore" (cyan-violet) + or chaud
 # ---------------------------------------------------------------------------
-const COL_PANEL_BG: Color = Color(0.04, 0.06, 0.14, 0.94)
-const COL_PANEL_BORDER: Color = Color(0.22, 0.52, 0.88, 0.55)
-const COL_BTN_NORMAL: Color = Color(0.08, 0.16, 0.32, 0.96)
-const COL_BTN_HOVER: Color = Color(0.12, 0.24, 0.46, 0.98)
-const COL_BTN_PRIMARY: Color = Color(0.10, 0.55, 0.85, 0.95)
-const COL_BTN_PRIMARY_HOVER: Color = Color(0.14, 0.65, 0.95, 0.98)
-const COL_BTN_PRIMARY_PRESS: Color = Color(0.06, 0.40, 0.65, 0.98)
+const COL_PANEL_BG: Color = Color(0.035, 0.045, 0.12, 0.94)
+const COL_PANEL_BORDER: Color = Color(0.42, 0.50, 0.96, 0.50)
+const COL_BTN_NORMAL: Color = Color(0.09, 0.11, 0.24, 0.96)
+const COL_BTN_HOVER: Color = Color(0.14, 0.17, 0.34, 0.98)
+const COL_BTN_PRIMARY: Color = Color(0.30, 0.34, 0.86, 0.95)
+const COL_BTN_PRIMARY_HOVER: Color = Color(0.38, 0.50, 0.95, 0.98)
+const COL_BTN_PRIMARY_PRESS: Color = Color(0.20, 0.24, 0.62, 0.98)
 const COL_BTN_DANGER: Color = Color(0.75, 0.18, 0.22, 0.9)
-const COL_ACCENT: Color = Color("#00c8ff")
-const COL_ACCENT_DIM: Color = Color("#0088bb")
-const COL_GOLD: Color = Color("#ffcc4d")
-const COL_TEXT: Color = Color("#edf7ff")
-const COL_TEXT_DIM: Color = Color("#8fa4c0")
-const COL_SECTION: Color = Color("#00b8e6")
+const COL_ACCENT: Color = Color("#35e6c9")
+const COL_ACCENT_DIM: Color = Color("#1f9e8f")
+const COL_VIOLET: Color = Color("#7c5cff")
+const COL_GOLD: Color = Color("#ffcf6b")
+const COL_TEXT: Color = Color("#eef4ff")
+const COL_TEXT_DIM: Color = Color("#96a3cc")
+const COL_SECTION: Color = Color("#35e6c9")
 const COL_SHADE: Color = Color(0.005, 0.01, 0.03, 0.78)
 const COL_HUD_BG: Color = Color(0.02, 0.04, 0.10, 0.88)
+
 
 # ---------------------------------------------------------------------------
 # Runtime state
@@ -543,10 +545,10 @@ func _create_hud() -> void:
 	row.add_child(time_stat.container)
 	_hud_time = time_stat.label
 
-	var currency_stat: Dictionary = _make_hud_stat(Color("#ffcc4d"))
+	var currency_stat: Dictionary = _make_hud_stat(COL_GOLD)
 	row.add_child(currency_stat.container)
 	_hud_currency = currency_stat.label
-	_hud_currency.add_theme_color_override("font_color", Color("#ffcc4d"))
+	_hud_currency.add_theme_color_override("font_color", COL_GOLD)
 
 	# --- Pause button (MOBILE FIX: larger touch area 48x48 minimum) ---
 	var pause_button: TextureButton = _make_icon_button(PAUSE_ICON_TEXTURE)
@@ -842,19 +844,19 @@ func _build_theme() -> Theme:
 	panel_style.shadow_size = 18
 	theme.set_stylebox("panel", "PanelContainer", panel_style)
 
-	# -- Primary button (play, replay, confirm) --
+	# -- Primary button (play, replay, confirm) -- aurore cyan-violet --
 	var btn_primary: StyleBoxFlat = StyleBoxFlat.new()
 	btn_primary.bg_color = COL_BTN_PRIMARY
 	btn_primary.set_corner_radius_all(14)
 	btn_primary.set_border_width_all(2)
-	btn_primary.border_color = Color(0.20, 0.65, 0.95, 0.60)
+	btn_primary.border_color = Color(0.35, 0.85, 0.85, 0.65)
 	btn_primary.set_content_margin_all(12.0)
-	btn_primary.shadow_color = Color(0.08, 0.45, 0.75, 0.25)
+	btn_primary.shadow_color = Color(0.35, 0.30, 0.85, 0.28)
 	btn_primary.shadow_size = 8
 
 	var btn_primary_hover: StyleBoxFlat = btn_primary.duplicate()
 	btn_primary_hover.bg_color = COL_BTN_PRIMARY_HOVER
-	btn_primary_hover.border_color = Color(0.30, 0.75, 1.0, 0.80)
+	btn_primary_hover.border_color = Color(0.45, 0.95, 0.90, 0.85)
 
 	var btn_primary_pressed: StyleBoxFlat = btn_primary.duplicate()
 	btn_primary_pressed.bg_color = COL_BTN_PRIMARY_PRESS
@@ -977,7 +979,7 @@ func _create_menu() -> void:
 
 	_ads_debug_label = Label.new()
 	_ads_debug_label.name = "AdsDebug"
-	_ads_debug_label.text = "SDK: ..."
+	_ads_debug_label.text = "Ads: ..."
 	_ads_debug_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_ads_debug_label.anchor_left = 0.5; _ads_debug_label.anchor_right = 0.5
 	_ads_debug_label.anchor_top = 1.0; _ads_debug_label.anchor_bottom = 1.0
@@ -2701,7 +2703,7 @@ func _on_score_submit_result(status: String, score: int) -> void:
 			_game_over_status.add_theme_color_override("font_color", COL_TEXT_DIM)
 			_game_over_status.text = Settings.loc("gameover_score_sent")
 		"retrying":
-			_game_over_status.add_theme_color_override("font_color", Color("#ffcc4d"))
+			_game_over_status.add_theme_color_override("font_color", COL_GOLD)
 			_game_over_status.text = Settings.loc("lb_retrying")
 		_:
 			_game_over_status.add_theme_color_override("font_color", Color("#ff9c7b"))
@@ -3909,7 +3911,7 @@ func _play_boss_defeat_cinematic() -> void:
 		ep.spread = 360.0; ep.gravity = Vector2.ZERO
 		ep.initial_velocity_min = 30.0; ep.initial_velocity_max = 80.0
 		ep.scale_amount_min = 1.5; ep.scale_amount_max = 3.0
-		ep.color = Color("#00c8ff")
+		ep.color = COL_ACCENT
 		ep.position = boss_pos + Vector2(_rng.randf_range(-80.0, 80.0), _rng.randf_range(-40.0, 40.0))
 		add_child(ep); ep.emitting = true
 		ep.get_tree().create_timer(1.0).timeout.connect(ep.queue_free)
@@ -4343,7 +4345,7 @@ func _play_zone_transition_cinematic(zone_index: int) -> void:
 	# Concentric rings expanding outward (warp tunnel)
 	for i in range(6):
 		var ring: ColorRect = ColorRect.new()
-		var zone_col: Color = Color("#00c8ff") if i % 2 == 0 else Color("#6644cc")
+		var zone_col: Color = COL_ACCENT if i % 2 == 0 else COL_VIOLET
 		ring.color = Color(zone_col.r, zone_col.g, zone_col.b, 0.0)
 		ring.position = Vector2(cx - 3.0, cy - 3.0)
 		ring.size = Vector2(6.0, 6.0)
@@ -4390,7 +4392,7 @@ func _play_zone_transition_cinematic(zone_index: int) -> void:
 
 	# --- Phase 3: Zone name SLAM ---
 	_cine_title_label.text = Settings.loc("zone_intro_%d" % (zone_index % 5))
-	_cine_title_label.add_theme_color_override("font_color", Color("#00c8ff"))
+	_cine_title_label.add_theme_color_override("font_color", COL_ACCENT)
 	_cine_title_label.modulate.a = 1.0
 	_cine_title_label.scale = Vector2(0.0, 0.0)
 	_cine_title_label.visible = true

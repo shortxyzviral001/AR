@@ -41,3 +41,7 @@ Thumbs.db
 .env
 .env.*
 *.pem
+
+# Previews de direction artistique générés pendant les sessions de design
+# (pas des assets du jeu -- ne pas versionner)
+/design_previews/

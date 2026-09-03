@@ -16,7 +16,7 @@
     </radialGradient>
     <linearGradient id="flame" x1="0" x2="0" y1="0" y2="1">
       <stop offset="0" stop-color="#ffffff"/>
-      <stop offset="1" stop-color="#ff8a3d"/>
+      <stop offset="1" stop-color="#7c5cff"/>
     </linearGradient>
   </defs>
 
@@ -31,8 +31,8 @@
 
   <circle cx="64" cy="46" r="10" fill="url(#cockpit)" stroke="#e5faff" stroke-width="2.8"/>
 
-  <circle cx="127" cy="70" r="2.8" fill="#ffb03d"/>
-  <circle cx="1" cy="70" r="2.8" fill="#ffb03d"/>
+  <circle cx="127" cy="70" r="2.8" fill="#ffcf6b"/>
+  <circle cx="1" cy="70" r="2.8" fill="#ffcf6b"/>
 
   <path d="M56 100 C58 108 60 114 64 120 C68 114 70 108 72 100 C68 104 60 104 56 100 Z" fill="url(#flame)" opacity="0.9"/>
 </svg>

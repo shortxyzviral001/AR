@@ -22,7 +22,7 @@ const HULL_FINISHES: Array[Dictionary] = [
 	{"name": "Corail Solaire", "color": Color("#ff7a59"), "tier": 6, "silhouette": "bombardier"},
 	{"name": "Cyan Quantique", "color": Color("#37e4e0"), "tier": 7, "silhouette": "furtif"},
 	{"name": "Magenta Nova", "color": Color("#ff4dc4"), "tier": 8, "silhouette": "furtif"},
-	{"name": "Or Stellaire", "color": Color("#ffcc4d"), "tier": 9, "silhouette": "legendaire"},
+	{"name": "Or Stellaire", "color": Color("#ffcf6b"), "tier": 9, "silhouette": "legendaire"},
 	{"name": "Prisme Cosmique", "color": Color("#ffffff"), "tier": 10, "silhouette": "legendaire"},
 ]
 
@@ -64,7 +64,7 @@ const RARITY_BANDS: Array[Dictionary] = [
 	{"max_tier_sum": 10, "label": "Commun", "color": Color("#b7c2d0")},
 	{"max_tier_sum": 16, "label": "Rare", "color": Color("#6bc7ff")},
 	{"max_tier_sum": 22, "label": "Epique", "color": Color("#c68cff")},
-	{"max_tier_sum": 999, "label": "Legendaire", "color": Color("#ffcc4d")},
+	{"max_tier_sum": 999, "label": "Legendaire", "color": Color("#ffcf6b")},
 ]
 
 const DEFAULT_SET_ID: String = "set_0_0_0"

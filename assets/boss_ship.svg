@@ -1,48 +1,48 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="200" height="160" viewBox="0 0 200 160">
   <defs>
     <radialGradient id="aura" cx="50%" cy="58%" r="60%">
-      <stop offset="0" stop-color="#ff5033" stop-opacity="0.4"/>
-      <stop offset="1" stop-color="#ff5033" stop-opacity="0"/>
+      <stop offset="0" stop-color="#c93dff" stop-opacity="0.4"/>
+      <stop offset="1" stop-color="#c93dff" stop-opacity="0"/>
     </radialGradient>
     <linearGradient id="hull" x1="0" x2="0" y1="0" y2="1">
-      <stop offset="0" stop-color="#241019"/>
-      <stop offset="0.5" stop-color="#5c1e30"/>
-      <stop offset="1" stop-color="#8a2c3c"/>
+      <stop offset="0" stop-color="#1c1024"/>
+      <stop offset="0.5" stop-color="#4a1e5c"/>
+      <stop offset="1" stop-color="#8a2c7c"/>
     </linearGradient>
     <linearGradient id="panel" x1="0" x2="1" y1="0" y2="0">
-      <stop offset="0" stop-color="#3a1420"/>
-      <stop offset="1" stop-color="#6e2333"/>
+      <stop offset="0" stop-color="#301438"/>
+      <stop offset="1" stop-color="#6e2368"/>
     </linearGradient>
     <radialGradient id="core" cx="42%" cy="35%" r="70%">
       <stop offset="0" stop-color="#fff6da"/>
       <stop offset="0.4" stop-color="#ffb23d"/>
-      <stop offset="1" stop-color="#7a0f18"/>
+      <stop offset="1" stop-color="#7a0f6a"/>
     </radialGradient>
     <linearGradient id="flame" x1="0" x2="0" y1="1" y2="0">
-      <stop offset="0" stop-color="#ffd0a0"/>
-      <stop offset="1" stop-color="#ff5b32"/>
+      <stop offset="0" stop-color="#e6c8ff"/>
+      <stop offset="1" stop-color="#7b3dff"/>
     </linearGradient>
   </defs>
 
   <ellipse cx="100" cy="90" rx="98" ry="78" fill="url(#aura)"/>
 
   <path d="M100 14 L140 26 L192 50 L156 62 L146 100 L168 128 L128 122 L100 140 L72 122 L32 128 L54 100 L44 62 L8 50 L60 26 Z"
-        fill="url(#hull)" stroke="#ffb0a0" stroke-width="4" stroke-linejoin="round"/>
+        fill="url(#hull)" stroke="#ffb0e8" stroke-width="4" stroke-linejoin="round"/>
 
-  <path d="M140 26 L156 62 L146 100" fill="none" stroke="#ff8f7a" stroke-width="2.4" opacity="0.55"/>
-  <path d="M60 26 L44 62 L54 100" fill="none" stroke="#ff8f7a" stroke-width="2.4" opacity="0.55"/>
+  <path d="M140 26 L156 62 L146 100" fill="none" stroke="#ff8fda" stroke-width="2.4" opacity="0.55"/>
+  <path d="M60 26 L44 62 L54 100" fill="none" stroke="#ff8fda" stroke-width="2.4" opacity="0.55"/>
 
-  <path d="M150 44 L168 52 L160 60 L142 52 Z" fill="#ffcf3d" opacity="0.9"/>
-  <path d="M50 44 L32 52 L40 60 L58 52 Z" fill="#ffcf3d" opacity="0.9"/>
+  <path d="M150 44 L168 52 L160 60 L142 52 Z" fill="#ffcf6b" opacity="0.9"/>
+  <path d="M50 44 L32 52 L40 60 L58 52 Z" fill="#ffcf6b" opacity="0.9"/>
 
-  <circle cx="118" cy="44" r="6" fill="url(#panel)" stroke="#ffb0a0" stroke-width="1.4"/>
-  <circle cx="82" cy="44" r="6" fill="url(#panel)" stroke="#ffb0a0" stroke-width="1.4"/>
-  <circle cx="132" cy="86" r="7" fill="url(#panel)" stroke="#ffb0a0" stroke-width="1.4"/>
-  <circle cx="68" cy="86" r="7" fill="url(#panel)" stroke="#ffb0a0" stroke-width="1.4"/>
+  <circle cx="118" cy="44" r="6" fill="url(#panel)" stroke="#ffb0e8" stroke-width="1.4"/>
+  <circle cx="82" cy="44" r="6" fill="url(#panel)" stroke="#ffb0e8" stroke-width="1.4"/>
+  <circle cx="132" cy="86" r="7" fill="url(#panel)" stroke="#ffb0e8" stroke-width="1.4"/>
+  <circle cx="68" cy="86" r="7" fill="url(#panel)" stroke="#ffb0e8" stroke-width="1.4"/>
 
   <path d="M84 22 C78 10 76 0 79 -10 C90 -6 98 4 99 18 Z" fill="url(#flame)" opacity="0.9"/>
   <path d="M116 22 C122 10 124 0 121 -10 C110 -6 102 4 101 18 Z" fill="url(#flame)" opacity="0.9"/>
 
-  <circle cx="100" cy="86" r="23" fill="url(#core)" stroke="#3c0810" stroke-width="3"/>
+  <circle cx="100" cy="86" r="23" fill="url(#core)" stroke="#2c0836" stroke-width="3"/>
   <circle cx="100" cy="86" r="30" fill="none" stroke="#ff8a3d" stroke-width="1.6" opacity="0.5"/>
 </svg>

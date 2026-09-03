@@ -20,7 +20,7 @@
     </radialGradient>
     <linearGradient id="flame" x1="0" x2="0" y1="0" y2="1">
       <stop offset="0" stop-color="#ffffff"/>
-      <stop offset="1" stop-color="#ff8a3d"/>
+      <stop offset="1" stop-color="#7c5cff"/>
     </linearGradient>
   </defs>
 
@@ -35,8 +35,8 @@
   <circle cx="64" cy="56" r="13" fill="url(#cockpit)" stroke="#e5faff" stroke-width="3.4"/>
   <ellipse cx="59" cy="50" rx="4.6" ry="3" fill="#ffffff" opacity="0.8" transform="rotate(-28 59 50)"/>
 
-  <circle cx="110" cy="80" r="2.8" fill="#3bffb0"/>
-  <circle cx="18" cy="80" r="2.8" fill="#3bffb0"/>
+  <circle cx="110" cy="80" r="2.8" fill="#ffcf6b"/>
+  <circle cx="18" cy="80" r="2.8" fill="#ffcf6b"/>
 
   <path d="M108 79 C110 84 111 89 110 93 C108 89 106 84 106 79 Z" fill="url(#flame)" opacity="0.9"/>
   <path d="M20 79 C22 84 23 89 22 93 C20 89 18 84 18 79 Z" fill="url(#flame)" opacity="0.9"/>
