@@ -1133,6 +1133,27 @@ func _make_secondary_button(text: String) -> Button:
 	return button
 
 
+func _apply_chip_button_style(button: Button) -> void:
+	"""Meme capsule neon que les autres boutons, mais avec des marges de
+	9-slice reduites pour les petites 'puces' de filtre (ex. Tous / Commun /
+	Rare) -- avec les marges pleines (60px) ces boutons etroits ecrasaient
+	le degrade et deformaient les coins arrondis en une forme pincee."""
+	var sb: StyleBoxTexture = StyleBoxTexture.new()
+	sb.texture = BTN_SECONDARY_TEXTURE
+	sb.texture_margin_left = 24.0
+	sb.texture_margin_right = 24.0
+	sb.texture_margin_top = 14.0
+	sb.texture_margin_bottom = 14.0
+	sb.set_content_margin_all(6.0)
+	sb.axis_stretch_horizontal = StyleBoxTexture.AXIS_STRETCH_MODE_STRETCH
+	sb.axis_stretch_vertical = StyleBoxTexture.AXIS_STRETCH_MODE_STRETCH
+	button.add_theme_stylebox_override("normal", sb)
+	var sb_h: StyleBoxTexture = sb.duplicate(); sb_h.modulate_color = Color(1.35, 1.35, 1.4, 1.0)
+	button.add_theme_stylebox_override("hover", sb_h)
+	var sb_p: StyleBoxTexture = sb.duplicate(); sb_p.texture = BTN_PRIMARY_TEXTURE
+	button.add_theme_stylebox_override("pressed", sb_p)
+
+
 func _make_volume_row(parent: Control, label_text: String, value: float, callback: Callable) -> Array:
 	"""Volume row: label + percentage + HSlider. Returns [slider, label]."""
 	var row: HBoxContainer = HBoxContainer.new()
@@ -1876,6 +1897,7 @@ func _build_shop_screen() -> Control:
 		fbtn.toggle_mode = true
 		fbtn.custom_minimum_size = Vector2(88.0, 34.0)
 		fbtn.add_theme_font_size_override("font_size", 12)
+		_apply_chip_button_style(fbtn)
 		fbtn.pressed.connect(_on_shop_filter_selected.bind(Settings.loc(key)))
 		filter_row.add_child(fbtn)
 		_shop_filter_buttons.append(fbtn)
