@@ -21,7 +21,7 @@ config/version_code=23
 boot_splash/bg_color=Color(0.02, 0.04, 0.1, 1)
 boot_splash/use_filter=false
 boot_splash/image="res://assets/splash_screen.png"
-config/icon="res://assets/icon_main.svg"
+config/icon="res://assets/icon_main.png"
 
 [autoload]
 

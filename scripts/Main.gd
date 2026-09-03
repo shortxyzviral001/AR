@@ -3,23 +3,23 @@ extends Node2D
 # ---------------------------------------------------------------------------
 # Textures
 # ---------------------------------------------------------------------------
-const PLAYER_TEXTURE: Texture2D = preload("res://assets/player_ship.svg")
-const HULL_TEXTURE_INTERCEPTEUR: Texture2D = preload("res://assets/hull_intercepteur.svg")
-const HULL_TEXTURE_BOMBARDIER: Texture2D = preload("res://assets/hull_bombardier.svg")
-const HULL_TEXTURE_FURTIF: Texture2D = preload("res://assets/hull_furtif.svg")
-const HULL_TEXTURE_LEGENDAIRE: Texture2D = preload("res://assets/hull_legendaire.svg")
+const PLAYER_TEXTURE: Texture2D = preload("res://assets/player_ship.png")
+const HULL_TEXTURE_INTERCEPTEUR: Texture2D = preload("res://assets/hull_intercepteur.png")
+const HULL_TEXTURE_BOMBARDIER: Texture2D = preload("res://assets/hull_bombardier.png")
+const HULL_TEXTURE_FURTIF: Texture2D = preload("res://assets/hull_furtif.png")
+const HULL_TEXTURE_LEGENDAIRE: Texture2D = preload("res://assets/hull_legendaire.png")
 
 const BADGE_ICON_TEXTURES: Dictionary = {
-	"comete": preload("res://assets/badge_comete.svg"),
-	"meteore": preload("res://assets/badge_meteore.svg"),
-	"etoile_filante": preload("res://assets/badge_etoile_filante.svg"),
-	"nebuleuse": preload("res://assets/badge_nebuleuse.svg"),
-	"satellite": preload("res://assets/badge_satellite.svg"),
-	"pulsar": preload("res://assets/badge_pulsar.svg"),
-	"trou_noir": preload("res://assets/badge_trou_noir.svg"),
-	"supernova": preload("res://assets/badge_supernova.svg"),
-	"constellation": preload("res://assets/badge_constellation.svg"),
-	"couronne": preload("res://assets/badge_couronne.svg"),
+	"comete": preload("res://assets/badge_comete.png"),
+	"meteore": preload("res://assets/badge_meteore.png"),
+	"etoile_filante": preload("res://assets/badge_etoile_filante.png"),
+	"nebuleuse": preload("res://assets/badge_nebuleuse.png"),
+	"satellite": preload("res://assets/badge_satellite.png"),
+	"pulsar": preload("res://assets/badge_pulsar.png"),
+	"trou_noir": preload("res://assets/badge_trou_noir.png"),
+	"supernova": preload("res://assets/badge_supernova.png"),
+	"constellation": preload("res://assets/badge_constellation.png"),
+	"couronne": preload("res://assets/badge_couronne.png"),
 }
 
 const TRAIL_ICON_TEXTURES: Dictionary = {
@@ -33,8 +33,8 @@ const TRAIL_ICON_TEXTURES: Dictionary = {
 const STAR_TEXTURE: Texture2D = preload("res://assets/star.svg")
 const METEOR_TEXTURE: Texture2D = preload("res://assets/meteor.svg")
 const HEART_TEXTURE: Texture2D = preload("res://assets/heart.svg")
-const ENEMY_TEXTURE: Texture2D = preload("res://assets/enemy_ship.svg")
-const BOSS_TEXTURE: Texture2D = preload("res://assets/boss_ship.svg")
+const ENEMY_TEXTURE: Texture2D = preload("res://assets/enemy_ship.png")
+const BOSS_TEXTURE: Texture2D = preload("res://assets/boss_ship.png")
 const PLAYER_BOLT_TEXTURE: Texture2D = preload("res://assets/player_bolt.svg")
 const ENEMY_BOLT_TEXTURE: Texture2D = preload("res://assets/enemy_bolt.svg")
 const GEAR_ICON_TEXTURE: Texture2D = preload("res://assets/gear_icon.svg")
@@ -436,9 +436,12 @@ func _create_player() -> void:
 	_player_shield = shield
 
 	var sprite: Sprite2D = Sprite2D.new()
-	sprite.texture = _hull_texture_for(Shop.equipped_hull_silhouette())
-	sprite.scale = Vector2(0.58, 0.58)
-	_player_base_tint = Shop.equipped_hull_color()
+	var silhouette0: String = Shop.equipped_hull_silhouette()
+	sprite.texture = _hull_texture_for(silhouette0)
+	# Textures peintes (PNG) plus grandes en resolution native que les
+	# anciens SVG vectoriels -- 0.29 conserve la meme taille a l'ecran.
+	sprite.scale = Vector2(0.29, 0.29)
+	_player_base_tint = _hull_tint_for(silhouette0, Shop.equipped_hull_color())
 	sprite.modulate = _player_base_tint
 	_player.add_child(sprite)
 	_player_sprite = sprite
@@ -460,6 +463,15 @@ func _hull_texture_for(silhouette: String) -> Texture2D:
 		"furtif": return HULL_TEXTURE_FURTIF
 		"legendaire": return HULL_TEXTURE_LEGENDAIRE
 		_: return PLAYER_TEXTURE
+
+
+# La coque "legendaire" est peinte en or/ivoire fixe (pas une silhouette
+# neutre) : on ne la teinte jamais dynamiquement pour conserver son rendu
+# tel que dessine, quelle que soit la couleur de finition equipee/prevue.
+func _hull_tint_for(silhouette: String, base_color: Color) -> Color:
+	if silhouette == "legendaire":
+		return Color.WHITE
+	return base_color
 
 
 func _configure_trail_style(trail: CPUParticles2D, style: String) -> void:
@@ -492,11 +504,12 @@ func _configure_trail_style(trail: CPUParticles2D, style: String) -> void:
 
 
 func _apply_equipped_cosmetics() -> void:
-	_player_base_tint = Shop.equipped_hull_color()
+	var silhouette1: String = Shop.equipped_hull_silhouette()
+	_player_base_tint = _hull_tint_for(silhouette1, Shop.equipped_hull_color())
 	if _player_sprite != null and _invuln_time <= 0.0 and _slow_time_left <= 0.0:
 		_player_sprite.modulate = _player_base_tint
 	if _player_sprite != null:
-		_player_sprite.texture = _hull_texture_for(Shop.equipped_hull_silhouette())
+		_player_sprite.texture = _hull_texture_for(silhouette1)
 	if _player_trail != null:
 		_player_trail.color = Shop.equipped_trail_color()
 		_configure_trail_style(_player_trail, Shop.equipped_trail_style())
@@ -1989,10 +2002,11 @@ func _on_shop_try_pressed(id: String) -> void:
 	_preview_active = true
 	var hull_color: Color = Shop.hull_info(int(item.hull)).color
 	var silhouette: String = Shop.hull_silhouette(int(item.hull))
+	var tinted_color: Color = _hull_tint_for(silhouette, hull_color)
 	if _player_sprite != null:
 		_player_sprite.texture = _hull_texture_for(silhouette)
-		_player_sprite.modulate = hull_color
-		_player_base_tint = hull_color
+		_player_sprite.modulate = tinted_color
+		_player_base_tint = tinted_color
 	if _player_trail != null:
 		_player_trail.color = Shop.trail_info(int(item.trail)).color
 		_configure_trail_style(_player_trail, String(Shop.trail_info(int(item.trail)).get("style", "sparkle")))
@@ -2093,12 +2107,13 @@ func _make_shop_item_card(item: Dictionary) -> Control:
 	var stage_center: CenterContainer = CenterContainer.new()
 	stage.add_child(stage_center)
 
+	var preview_silhouette: String = Shop.hull_silhouette(int(item.hull))
 	var ship_preview: TextureRect = TextureRect.new()
-	ship_preview.texture = _hull_texture_for(Shop.hull_silhouette(int(item.hull)))
+	ship_preview.texture = _hull_texture_for(preview_silhouette)
 	ship_preview.custom_minimum_size = Vector2(74.0, 74.0)
 	ship_preview.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
 	ship_preview.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	ship_preview.modulate = hull.color
+	ship_preview.modulate = _hull_tint_for(preview_silhouette, hull.color)
 	stage_center.add_child(ship_preview)
 
 	if rarity_label == "Legendaire":
@@ -2128,7 +2143,11 @@ func _make_shop_item_card(item: Dictionary) -> Control:
 	var trail_icon: Texture2D = TRAIL_ICON_TEXTURES.get(String(trail.get("style", "sparkle")), TRAIL_ICON_TEXTURES["sparkle"])
 	var badge_icon: Texture2D = BADGE_ICON_TEXTURES.get(String(badge.get("icon", "comete")), BADGE_ICON_TEXTURES["comete"])
 	accessories_row.add_child(_make_accessory_chip(trail_icon, trail.color, String(trail.name)))
-	accessories_row.add_child(_make_accessory_chip(badge_icon, badge.color, String(badge.name)))
+	# Les badges sont maintenant des illustrations peintes en couleurs
+	# fixes (pas des silhouettes blanches) -- ne pas les teinter, sinon
+	# leurs propres couleurs (bleu comete, orange meteore, etc.) seraient
+	# ecrasees par la couleur de rarete du badge.
+	accessories_row.add_child(_make_accessory_chip(badge_icon, badge.color, String(badge.name), false))
 
 	var rarity_row: Label = Label.new()
 	rarity_row.text = rarity_label.to_upper()
@@ -2165,13 +2184,13 @@ func _make_shop_item_card(item: Dictionary) -> Control:
 	return card
 
 
-func _make_accessory_chip(texture: Texture2D, color: Color, label_text: String) -> Control:
+func _make_accessory_chip(texture: Texture2D, color: Color, label_text: String, tint: bool = true) -> Control:
 	var col: VBoxContainer = VBoxContainer.new()
 	col.alignment = BoxContainer.ALIGNMENT_CENTER
 	col.add_theme_constant_override("separation", 2)
 	var icon_center: CenterContainer = CenterContainer.new()
 	var icon: TextureRect = TextureRect.new()
-	icon.texture = texture; icon.modulate = color
+	icon.texture = texture; icon.modulate = color if tint else Color.WHITE
 	icon.custom_minimum_size = Vector2(24.0, 24.0)
 	icon.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
 	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
@@ -3187,7 +3206,9 @@ func _maybe_spawn_enemy() -> void:
 
 	var sprite: Sprite2D = Sprite2D.new()
 	sprite.name = "Sprite"; sprite.texture = ENEMY_TEXTURE
-	sprite.scale = Vector2(0.52, 0.52) if kind == "chasseur" else Vector2(0.62, 0.62)
+	# 0.2647 = equivalent visuel de l'ancien SVG 112x112 avec scale 0.52 sur
+	# la nouvelle texture peinte PNG plus grande nativement.
+	sprite.scale = Vector2(0.2647, 0.2647) if kind == "chasseur" else Vector2(0.3157, 0.3157)
 	sprite.modulate = base_color
 	enemy.add_child(sprite)
 	var shape: CollisionShape2D = CollisionShape2D.new()
@@ -3296,7 +3317,9 @@ func _spawn_boss() -> void:
 	_boss.collision_layer = LAYER_ENEMY; _boss.collision_mask = LAYER_PLAYER
 	_boss.monitoring = true; _boss.set_meta("hp", hp); _boss.set_meta("max_hp", hp)
 	var sprite: Sprite2D = Sprite2D.new()
-	sprite.name = "Sprite"; sprite.texture = BOSS_TEXTURE; sprite.scale = Vector2(0.72, 0.72)
+	# 0.288 = equivalent visuel de l'ancien SVG 200x160 avec scale 0.72 sur
+	# la nouvelle texture peinte PNG plus grande nativement.
+	sprite.name = "Sprite"; sprite.texture = BOSS_TEXTURE; sprite.scale = Vector2(0.288, 0.288)
 	_boss.add_child(sprite); _boss_sprite = sprite
 	var shape: CollisionShape2D = CollisionShape2D.new()
 	var circle: CircleShape2D = CircleShape2D.new()
@@ -3751,7 +3774,7 @@ func _play_boss_warning_cinematic(boss_name: String) -> void:
 	# Create ghost boss sprite
 	var boss_ghost: Sprite2D = Sprite2D.new()
 	boss_ghost.texture = BOSS_TEXTURE
-	boss_ghost.scale = Vector2(1.8, 1.8)
+	boss_ghost.scale = Vector2(0.72, 0.72)
 	boss_ghost.modulate = Color(0.8, 0.1, 0.1, 0.0)
 	boss_ghost.position = Vector2(cx, size.y + 120.0)
 	boss_ghost.z_index = 195
@@ -4163,7 +4186,7 @@ func _play_story_cinematic() -> void:
 	# Hero ship enters from the right
 	var hero: Sprite2D = Sprite2D.new()
 	hero.texture = PLAYER_TEXTURE
-	hero.scale = Vector2(0.7, 0.7)
+	hero.scale = Vector2(0.35, 0.35)
 	hero.position = Vector2(size.x + 80.0, cy - 40.0)
 	hero.rotation = -0.25
 	hero.z_index = 193
@@ -4255,7 +4278,7 @@ func _play_story_cinematic() -> void:
 	# The Scourge rises from below, huge
 	var scourge: Sprite2D = Sprite2D.new()
 	scourge.texture = BOSS_TEXTURE
-	scourge.scale = Vector2(2.4, 2.4)
+	scourge.scale = Vector2(0.96, 0.96)
 	scourge.position = Vector2(size.x - 160.0, size.y + 160.0)
 	scourge.modulate = Color(1.0, 0.2, 0.15, 0.0)
 	scourge.z_index = 192
