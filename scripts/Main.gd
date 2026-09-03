@@ -274,6 +274,7 @@ var _boss_flash_rect: ColorRect
 var _ad_countdown_label: Label
 var _ad_continue_button: Button
 var _ad_check_start: float = 0.0
+var _interstitial_prompt: PanelContainer
 
 # Run stats
 var _run_crystals: int = 0
@@ -743,6 +744,42 @@ func _create_hud() -> void:
 	_ad_continue_button.visible = false
 	layer.add_child(_ad_continue_button)
 
+	# --- Interstitial prompt (top, below HUD bar) : jamais automatique --
+	# Adsterra n'ayant pas de format interstitiel plein ecran natif, ceci
+	# est une simple invite cliquable ; le joueur choisit d'ouvrir la pub
+	# ou de l'ignorer (bouton fermer), sans jamais rediriger de force.
+	_interstitial_prompt = PanelContainer.new()
+	_interstitial_prompt.name = "InterstitialPrompt"
+	var interstitial_sb: StyleBoxFlat = StyleBoxFlat.new()
+	interstitial_sb.bg_color = Color(0.14, 0.10, 0.02, 0.94)
+	interstitial_sb.set_corner_radius_all(12)
+	interstitial_sb.set_border_width_all(2)
+	interstitial_sb.border_color = COL_GOLD
+	interstitial_sb.set_content_margin_all(10.0)
+	_interstitial_prompt.add_theme_stylebox_override("panel", interstitial_sb)
+	_interstitial_prompt.anchor_left = 0.5; _interstitial_prompt.anchor_right = 0.5
+	_interstitial_prompt.offset_left = -170.0; _interstitial_prompt.offset_right = 170.0
+	_interstitial_prompt.offset_top = 70.0; _interstitial_prompt.offset_bottom = 118.0
+	_interstitial_prompt.visible = false
+	_interstitial_prompt.z_index = 90
+	layer.add_child(_interstitial_prompt)
+	var interstitial_row: HBoxContainer = HBoxContainer.new()
+	interstitial_row.add_theme_constant_override("separation", 10)
+	_interstitial_prompt.add_child(interstitial_row)
+	var interstitial_label: Label = Label.new()
+	interstitial_label.text = Settings.loc("ad_interstitial_prompt")
+	interstitial_label.add_theme_font_size_override("font_size", 13)
+	interstitial_label.add_theme_color_override("font_color", COL_GOLD)
+	interstitial_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	interstitial_label.autowrap_mode = TextServer.AUTOWRAP_WORD
+	interstitial_row.add_child(interstitial_label)
+	var interstitial_close: Button = Button.new()
+	interstitial_close.text = "✕"
+	interstitial_close.custom_minimum_size = Vector2(28.0, 28.0)
+	interstitial_close.pressed.connect(_dismiss_interstitial_prompt)
+	interstitial_row.add_child(interstitial_close)
+	_interstitial_prompt.gui_input.connect(_on_interstitial_prompt_input)
+
 
 func _make_hud_label() -> Label:
 	var label: Label = Label.new()
@@ -969,6 +1006,8 @@ func _show_screen(screen: Control) -> void:
 	if _screen_tutorial != null: _screen_tutorial.visible = screen == _screen_tutorial
 	if _screen_consent != null: _screen_consent.visible = screen == _screen_consent
 	if _menu_shade != null: _menu_shade.visible = screen != null
+	if screen != null:
+		_dismiss_interstitial_prompt()
 
 
 # ---------------------------------------------------------------------------
@@ -2496,7 +2535,8 @@ func _show_game_over() -> void:
 	Audio.play_sfx("game_over")
 	AdsManager.hide_game_banner()
 	if _elapsed >= AdsManager.GAMEOVER_INTERSTITIAL_MIN_SESSION_S:
-		AdsManager.maybe_show_game_over_interstitial()
+		if AdsManager.maybe_show_game_over_interstitial():
+			_show_interstitial_prompt()
 
 	var is_new_local_record: bool = _score > _high_score
 	if is_new_local_record:
@@ -2544,7 +2584,7 @@ func _show_game_over() -> void:
 
 
 func _refresh_ads_status() -> void:
-	var status: String = "SDK: " + AdsManager.get_status()
+	var status: String = AdsManager.get_status()
 	if _ads_status_label != null:
 		_ads_status_label.text = status
 	if _ads_debug_label != null:
@@ -2776,7 +2816,7 @@ func _start_game() -> void:
 	if not story_played:
 		_play_intro_cinematic()
 		await _cinematic_finished()
-	# Banniere Unity Ads pendant la partie (Android).
+	# Banniere Adsterra pendant la partie (si une zone est configuree).
 	AdsManager.show_game_banner()
 	_spawn_timer.start(0.7)
 	_enemy_spawn_timer.start(_enemy_spawn_interval())
@@ -3385,10 +3425,37 @@ func _defeat_boss() -> void:
 	# Zone transition cinematic
 	_play_zone_transition_cinematic(_zone_index)
 	await _cinematic_finished()
-	# Interstitiel Unity Ads tous les N secteurs (Android).
-	AdsManager.maybe_show_interstitial(_zone_index)
+	# Invite (non-intrusive) a consulter une pub Adsterra tous les N secteurs.
+	if AdsManager.maybe_show_interstitial(_zone_index):
+		_show_interstitial_prompt()
 	_spawn_timer.start(0.7)
 	_enemy_spawn_timer.start(_enemy_spawn_interval())
+
+
+## Affiche une invite cliquable (jamais automatique) proposant une pub
+## Adsterra. Se ferme seule apres quelques secondes si ignoree.
+func _show_interstitial_prompt() -> void:
+	if _interstitial_prompt == null:
+		return
+	_interstitial_prompt.modulate.a = 0.0
+	_interstitial_prompt.visible = true
+	var tw: Tween = create_tween()
+	tw.tween_property(_interstitial_prompt, "modulate:a", 1.0, 0.25)
+	tw.tween_interval(6.0)
+	tw.tween_property(_interstitial_prompt, "modulate:a", 0.0, 0.4)
+	tw.tween_callback(func(): _interstitial_prompt.visible = false)
+
+
+func _dismiss_interstitial_prompt() -> void:
+	if _interstitial_prompt == null:
+		return
+	_interstitial_prompt.visible = false
+
+
+func _on_interstitial_prompt_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		OS.shell_open(AdsManager.AD_SMARTLINK_URL)
+		_dismiss_interstitial_prompt()
 
 
 func _update_boss_bar() -> void:

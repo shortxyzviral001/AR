@@ -67,7 +67,7 @@ traînée + insigne) à équiper sur ton vaisseau. Un classement en ligne
 │   ├── Settings.gd        Paramètres persistants + traductions FR/EN
 │   ├── Shop.gd            Génération et logique de la boutique cosmétique
 │   ├── Leaderboard.gd     Classement en ligne (Firebase Firestore, REST)
-│   ├── AdsManager.gd      Publicités (Unity Ads Android + Adsterra desktop)
+│   ├── AdsManager.gd      Publicités Adsterra (Android + Desktop, sans SDK natif)
 │   ├── Audio.gd           SFX/musique 100% synthétisés en code
 │   ├── Starfield.gd       Fond étoilé défilant, transitions de secteur
 │   ├── TouchControls.gd   Joystick tactile (mobile)
@@ -86,7 +86,7 @@ traînée + insigne) à équiper sur ton vaisseau. Un classement en ligne
 - [`docs/LEADERBOARD_SETUP.md`](docs/LEADERBOARD_SETUP.md) — configuration du
   classement en ligne (Firebase Firestore gratuit, règles de sécurité).
 - [`docs/ADS_SETUP.md`](docs/ADS_SETUP.md) — configuration des publicités
-  (Unity Ads sur Android, Adsterra en fallback desktop).
+  (Adsterra, toutes plateformes, formats et flux de récompense maison).
 - [`docs/STORE_LISTING.md`](docs/STORE_LISTING.md) — texte de présentation et
   recommandations de captures d'écran pour les fiches store (Uptodown,
   Play Store...).
@@ -144,9 +144,11 @@ de s'installer (signature, alignement, architecture).
 - Les identifiants de signature Android (mot de passe du keystore de
   release) ne doivent exister que localement ou en secret GitHub Actions,
   jamais dans un fichier versionné.
-- `TEST_MODE` dans `scripts/AdsManager.gd` doit rester à `false` en
-  production : il ne doit être repassé à `true` que temporairement pour du
-  développement local avec des publicités de test Unity Ads.
+- Les URLs de zones Adsterra dans `scripts/AdsManager.gd` ne sont pas des
+  secrets (elles sont destinées à apparaître publiquement dans les pubs
+  affichées) ; en revanche, la **clé API Adsterra** (reporting/statistiques)
+  ne doit jamais être committée — elle ne sert qu'en local ou en script
+  d'export de données, jamais dans le code du jeu lui-même.
 
 ## Licence
 

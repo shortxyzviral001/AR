@@ -1,78 +1,85 @@
-## AdsManager - publicite Unity Ads (Android) + Adsterra (desktop).
+## AdsManager - publicité via Adsterra, sur toutes les plateformes (Android +
+## Desktop). Remplace l'ancienne intégration Unity Ads (retirée : le SDK
+## natif n'était de toute façon jamais livré dans ce dépôt, cf. absence de
+## android/plugins/unityads/).
 ##
-## Plateformes :
-##   - Android  : SDK Unity Ads natif (banniere, interstitiel, recompense)
-##                via le plugin UnityAds.
-##   - PC / autres : les tags HTML Adsterra sont rendus dans le navigateur
-##                systeme (page locale generee par AdsManager). La recompense
-##                est accordee apres un temps minimum de visionnage
-##                (REWARD_MIN_VIEW_S) + retour au jeu.
+## Adsterra n'a PAS de format "pub récompensée" avec callback de complétion
+## comme Unity Ads : c'est un réseau display/pop/smartlink classique. La
+## récompense "x2 cristaux" est donc entièrement recréée ici : on ouvre une
+## pub Adsterra (Direct Link) dans le navigateur système, on impose un
+## visionnage minimum (REWARD_MIN_VIEW_S), puis on accorde la récompense
+## quand le joueur revient dans le jeu. Ce flux est volontairement TOUJOURS
+## déclenché par un clic explicite du joueur (jamais automatique), à la fois
+## pour rester conforme aux règles anti-fraude d'Adsterra et pour ne pas
+## dégrader l'expérience de jeu.
 ##
-## Unity Ads IDs (Android) :
-##   - Game ID : 800360647
-##   - Placements : Banner_Android, Interstitial_Android, Rewarded_Android
+## Formats utilisés :
+##   - Récompensée ("x2 cristaux")   : Direct Link / Popunder (onglet dédié)
+##   - Interstitiel (entre secteurs) : Social Bar (bandeau discret, quelques
+##                                     secondes, fermable) affiché en overlay
+##                                     dans une page locale, pas de nouvel
+##                                     onglet -> n'interrompt pas le jeu.
+##   - Bannière (persistante en jeu) : Banner 320x50 (mobile) / 468x60
+##                                     (desktop), overlay HTML léger.
 ##
-## Consentement GDPR : le joueur doit accepter avant la premiere pub, le choix
-## est memorise (user://astro_recolte_ads.cfg) et modifiable dans Parametres.
-## Plafond quotidien : MAX_REWARDED_PER_DAY pubs recompensees par jour.
+## Identifiants Adsterra (compte publisher "multidevsn") :
+##   - Direct Link / Popunder : https://www.profitableratecpmnetwork.com/cu6vgyq1?key=27aad7f77209ac09de82da823d90b505
+##   - Smartlink               : https://www.profitableratecpmnetwork.com/vaam7i8w?key=6149a9a739adbbe40f8838e03d54b07d
+##   - Social Bar / Native Banner / bannières classiques : configurés sur le
+##     dashboard Adsterra (compte multidevsn), zones à coller dans
+##     ZONE_SOCIAL_BAR_SNIPPET / ZONE_BANNER_SNIPPETS ci-dessous (le code
+##     JS exact de chaque zone n'est pas exposé par l'API Publisher, qui ne
+##     renvoie que les métadonnées de zone -- il faut le copier une fois
+##     depuis Adsterra > Websites > [zone] > Get code).
+##
+## Consentement GDPR : le joueur doit accepter avant la première pub, le choix
+## est mémorisé (user://astro_recolte_ads.cfg) et modifiable dans Paramètres.
+## Plafond quotidien : MAX_REWARDED_PER_DAY pubs récompensées par jour.
 extends Node
 
-## Journalise uniquement dans les builds de debug (export --debug / editeur) :
-## evite de polluer les logs (et la console `adb logcat`) des joueurs en
-## production tout en gardant les traces utiles pendant le developpement.
+## Journalise uniquement dans les builds de debug (export --debug / éditeur) :
+## évite de polluer les logs des joueurs en production.
 static func _log(message: String) -> void:
 	if OS.is_debug_build():
 		print(message)
 
-# --- Unity Ads Configuration (Android) ------------------------------------
-# Game ID Unity Ads (depuis cloud.unity.com)
-const UNITY_GAME_ID: String = "800360647"
+# --- Configuration Adsterra ------------------------------------------------
 
-# Placement IDs (configures dans Unity Dashboard)
-const PLACEMENT_INTERSTITIAL: String = "Interstitial_Android"
-const PLACEMENT_REWARDED: String = "Rewarded_Android"
-const PLACEMENT_BANNER: String = "Banner_Android"
+## Direct Link (Popunder) : support de la pub "récompensée". S'ouvre dans un
+## nouvel onglet/fenêtre du navigateur système uniquement sur clic du joueur.
+const AD_REWARDED_URL: String = "https://www.profitableratecpmnetwork.com/cu6vgyq1?key=27aad7f77209ac09de82da823d90b505"
 
-# Mode test (mettre a true uniquement pour du developpement local)
-const TEST_MODE: bool = false
+## Smartlink : utilisé comme repli si le Direct Link venait à être invalidé.
+const AD_SMARTLINK_URL: String = "https://www.profitableratecpmnetwork.com/vaam7i8w?key=6149a9a739adbbe40f8838e03d54b07d"
 
-# --- Zones Adsterra (desktop fallback) ------------------------------------
-# Tags HTML/JS Adsterra utilises dans la page desktop (navigateur systeme).
-const DESKTOP_AD_ZONES: Array[String] = [
-	"""<script>
-  atOptions = {
-    'key' : 'f4572b309ba38734770ce69a48a06606',
-    'format' : 'iframe',
-    'height' : 250,
-    'width' : 300,
-    'params' : {}
-  };
-</script>
-<script src="https://www.highperformanceformat.com/f4572b309ba38734770ce69a48a06606/invoke.js"></script>""",
-	"""<script async="async" data-cfasync="false" src="https://pl30848212.effectivecpmnetwork.com/9d4b72438678918e9dd773f5315482a0/invoke.js"></script>
-<div id="container-9d4b72438678918e9dd773f5315482a0"></div>""",
-]
-var _desktop_rotation_index: int = 0
+## Zones "display" (Social Bar / bannières) : à coller depuis le dashboard
+## Adsterra (Websites > zone concernée > Get code). Laissées vides par
+## défaut -> le jeu se contente alors du Direct Link ci-dessus pour la
+## récompense, sans bannière ni interstitiel display tant que ces zones ne
+## sont pas renseignées (aucune requête n'est faite vers une zone vide).
+const ZONE_SOCIAL_BAR_SNIPPET: String = ""
+const ZONE_BANNER_SNIPPET: String = ""
 
-# Duree minimale de visionnage avant d'accorder la recompense (secondes),
-# enforcee cote Android par le plugin et cote desktop par AdsManager.
+# Durée minimale de visionnage avant d'accorder la récompense (secondes),
+# imposée côté client : le joueur doit rester sur la pub au moins ce temps.
 const REWARD_MIN_VIEW_S: float = 15.0
 const REWARD_MIN_VIEW_MS: int = 15000
 
-# Plafond quotidien de pubs recompensees (economie des cristaux).
+# Plafond quotidien de pubs récompensées (économie des cristaux).
 const MAX_REWARDED_PER_DAY: int = 5
 
-# Freq. des interstitiels (Android) : un tous les N secteurs + un sur game
-# over, avec un temps de repos entre deux pour ne pas etouffer le joueur.
+# Fréquence des "interstitiels" (Social Bar) : un tous les N secteurs, avec
+# un temps de repos entre deux pour ne pas étouffer le joueur.
 const INTERSTITIAL_EVERY_ZONES: int = 3
 const INTERSTITIAL_COOLDOWN_MS: int = 90000
 const GAMEOVER_INTERSTITIAL_MIN_SESSION_S: float = 60.0
 const GAMEOVER_INTERSTITIAL_COOLDOWN_MS: int = 120000
 
-# Page locale generee pour les pubs desktop (navigateur systeme).
-const DESKTOP_AD_PAGE_NAME: String = "unity_ads_ad.html"
-# Repli si la page locale ne peut pas etre ecrite (ex: export Web).
-const DESKTOP_AD_PAGE_URL_FALLBACK: String = "https://multidevsn.github.io/ad.html"
+# Pages HTML locales générées (navigateur système / WebView).
+const AD_PAGE_NAME: String = "astro_recolte_ad.html"
+const INTERSTITIAL_PAGE_NAME: String = "astro_recolte_interstitial.html"
+# Repli si la page locale ne peut pas être écrite (ex: export Web).
+const AD_PAGE_URL_FALLBACK: String = "https://multidevsn.github.io/ad.html"
 
 # Persistance (consentement + compteur quotidien).
 const SAVE_PATH: String = "user://astro_recolte_ads.cfg"
@@ -84,112 +91,34 @@ const CONSENT_UNDECIDED: String = "undecided"
 var _consent: String = CONSENT_UNDECIDED
 var _views_date: String = ""
 var _views_count: int = 0
-var _plugin_missing: bool = false
-var _initialized: bool = false
 
-# Etat desktop (pub ouverte dans le navigateur).
-var _desktop_open_at: int = -1
-var _desktop_focus_back: bool = false
-var _desktop_lost_focus: bool = false
-var _desktop_continue_pressed: bool = false
+# Etat de la pub récompensée ouverte dans le navigateur.
+var _ad_open_at: int = -1
+var _ad_focus_back: bool = false
+var _ad_lost_focus: bool = false
+var _ad_continue_pressed: bool = false
 
-# Etat banniere / interstitiels.
+# Etat bannière / interstitiels (overlay in-app, pas de fenêtre externe).
 var _banner_visible: bool = false
 var _last_interstitial_ms: int = 0
 var _last_gameover_interstitial_ms: int = 0
-var _reward_pending: bool = false
 
 
 func _ready() -> void:
 	_load()
 	_load_notified()
-	if OS.get_name() == "Android":
-		if not Engine.has_singleton("UnityAds"):
-			push_warning("[AdsManager] Plugin UnityAds introuvable - pubs indisponibles")
-			_plugin_missing = true
-		else:
-			_log("[AdsManager] Plugin UnityAds pret - initialisation...")
-			var plugin = _get_plugin()
-			if plugin:
-				plugin.initialize(UNITY_GAME_ID, TEST_MODE)
-				# Connecter les signaux du plugin
-				plugin.connect("onInitialized", _on_unity_initialized)
-				plugin.connect("onRewardedLoaded", _on_rewarded_loaded)
-				plugin.connect("onRewardedFailed", _on_rewarded_failed)
-				plugin.connect("onRewardedCompleted", _on_rewarded_completed)
-				plugin.connect("onRewardedHidden", _on_rewarded_hidden)
-				plugin.connect("onInterstitialLoaded", _on_interstitial_loaded)
-				plugin.connect("onInterstitialFailed", _on_interstitial_failed)
-				plugin.connect("onBannerLoaded", _on_banner_loaded)
-				plugin.connect("onBannerFailed", _on_banner_failed)
 
 
 func _notification(what: int) -> void:
-	# Sur desktop, on sait que le joueur revient du navigateur quand l'app
-	# reprend le focus -> la recompense peut etre accordee.
+	# On sait que le joueur revient du navigateur quand l'app reprend le
+	# focus -> la récompense peut être accordée.
 	if what == NOTIFICATION_APPLICATION_FOCUS_IN:
-		_desktop_focus_back = true
+		_ad_focus_back = true
 	elif what == NOTIFICATION_APPLICATION_FOCUS_OUT:
-		_desktop_lost_focus = true
+		_ad_lost_focus = true
 
 
-# --- Unity Ads Callbacks -------------------------------------------------
-
-func _on_unity_initialized(success: bool) -> void:
-	if success:
-		_log("[AdsManager] Unity Ads initialise avec succes")
-		_initialized = true
-		# Precharger les pubs
-		_preload_ads()
-	else:
-		push_warning("[AdsManager] Echec initialisation Unity Ads")
-
-
-func _preload_ads() -> void:
-	if not _initialized:
-		return
-	var plugin = _get_plugin()
-	if plugin == null:
-		return
-	# Precharger interstitiel et rewarded
-	plugin.loadInterstitial(PLACEMENT_INTERSTITIAL)
-	plugin.loadRewarded(PLACEMENT_REWARDED)
-
-
-func _on_rewarded_loaded(_placement: String) -> void:
-	_log("[AdsManager] Pub recompensee pretee")
-
-
-func _on_rewarded_failed(_placement: String, error: String) -> void:
-	push_warning("[AdsManager] Echec chargement pub recompensee: ", error)
-
-
-func _on_rewarded_completed(_placement: String) -> void:
-	_log("[AdsManager] Pub recompensee terminee - recompense accordee")
-	_reward_pending = true
-
-
-func _on_rewarded_hidden(_placement: String) -> void:
-	_log("[AdsManager] Pub recompensee fermee")
-
-
-func _on_interstitial_loaded(_placement: String) -> void:
-	_log("[AdsManager] Interstitiel prete")
-
-
-func _on_interstitial_failed(_placement: String, error: String) -> void:
-	push_warning("[AdsManager] Echec chargement interstitiel: ", error)
-
-
-func _on_banner_loaded(_placement: String) -> void:
-	_log("[AdsManager] Banniere chargée")
-
-
-func _on_banner_failed(_placement: String, error: String) -> void:
-	push_warning("[AdsManager] Echec chargement banniere: ", error)
-
-
-# --- Persistance ---------------------------------------------------------
+# --- Persistance -----------------------------------------------------------
 
 func _today() -> String:
 	return Time.get_date_string_from_system()
@@ -212,7 +141,7 @@ func _save() -> void:
 	config.save(SAVE_PATH)
 
 
-## Remet le compteur a zero si la date a change.
+## Remet le compteur à zéro si la date a changé.
 func _ensure_day() -> void:
 	var today: String = _today()
 	if _views_date != today:
@@ -221,20 +150,14 @@ func _ensure_day() -> void:
 		_save()
 
 
-func _get_plugin():
-	if _plugin_missing or OS.get_name() != "Android":
-		return null
-	return Engine.get_singleton("UnityAds")
+# --- Consentement GDPR -------------------------------------------------
 
-
-# --- Consentement GDPR ---------------------------------------------------
-
-## Le joueur a accepte les publicites.
+## Le joueur a accepté les publicités.
 func has_consent() -> bool:
 	return _consent == CONSENT_ACCEPTED
 
 
-## Un choix (accepter ou refuser) a deja ete fait.
+## Un choix (accepter ou refuser) a déjà été fait.
 func consent_decided() -> bool:
 	return _consent != CONSENT_UNDECIDED
 
@@ -246,7 +169,7 @@ func set_consent(accepted: bool) -> void:
 		hide_game_banner()
 
 
-# --- Plafond quotidien ---------------------------------------------------
+# --- Plafond quotidien -------------------------------------------------
 
 func rewarded_views_today() -> int:
 	_ensure_day()
@@ -257,7 +180,7 @@ func views_remaining_today() -> int:
 	return max(MAX_REWARDED_PER_DAY - rewarded_views_today(), 0)
 
 
-## La pub peut-elle etre proposee (consentement OK + plafond pas atteint) ?
+## La pub peut-elle être proposée (consentement OK + plafond pas atteint) ?
 func can_show_rewarded() -> bool:
 	if not has_consent():
 		return false
@@ -265,222 +188,142 @@ func can_show_rewarded() -> bool:
 	return _views_count < MAX_REWARDED_PER_DAY
 
 
-# --- Public API (recompense) ---------------------------------------------
+# --- Public API (récompense) --------------------------------------------
 
-## Affiche la pub du bouton x2 cristaux. Retourne vrai si lancee.
-## Android : SDK Unity Ads. PC/autres : navigateur systeme.
+## Affiche la pub du bouton x2 cristaux (Direct Link Adsterra dans un nouvel
+## onglet/fenêtre du navigateur système). Retourne vrai si lancée. Identique
+## sur toutes les plateformes : Adsterra n'ayant pas de SDK natif Android,
+## on utilise systématiquement le navigateur, avec un délai minimum de
+## visionnage imposé côté client (voir pop_reward()).
 func show_rewarded() -> bool:
 	if not can_show_rewarded():
 		return false
-	if OS.get_name() == "Android":
-		var plugin = _get_plugin()
-		if plugin == null:
-			return false
-		if not plugin.isReady(PLACEMENT_REWARDED):
-			# Recharger et retenter
-			plugin.loadRewarded(PLACEMENT_REWARDED)
-			return false
-		_views_count += 1
-		_save()
-		plugin.showRewarded(PLACEMENT_REWARDED)
-		return true
-	# Desktop / autres plateformes : ouvre la pub dans le navigateur systeme.
 	_views_count += 1
 	_save()
-	_open_desktop_ad()
+	_open_rewarded_ad()
 	return true
 
 
-## Retourne vrai UNE FOIS quand la recompense doit etre accordee :
-##   - Android : callback onRewardedCompleted du plugin Unity Ads.
-##   - Desktop : >= REWARD_MIN_VIEW_S ecoulees ET retour au jeu (ou clic sur
-##     "J'ai regarde", ou focus jamais quitte).
+## Retourne vrai UNE FOIS quand la récompense doit être accordée :
+## >= REWARD_MIN_VIEW_S écoulées ET retour au jeu (ou clic sur
+## "J'ai regardé", ou focus jamais quitté).
 func pop_reward() -> bool:
-	if OS.get_name() == "Android":
-		if _reward_pending:
-			_reward_pending = false
-			return true
+	if _ad_open_at < 0:
 		return false
-	if _desktop_open_at < 0:
-		return false
-	var elapsed_s: float = (Time.get_ticks_msec() - _desktop_open_at) / 1000.0
+	var elapsed_s: float = (Time.get_ticks_msec() - _ad_open_at) / 1000.0
 	if elapsed_s < REWARD_MIN_VIEW_S:
 		return false
-	if _desktop_focus_back or _desktop_continue_pressed or not _desktop_lost_focus:
-		_desktop_open_at = -1
-		_desktop_focus_back = false
-		_desktop_continue_pressed = false
+	if _ad_focus_back or _ad_continue_pressed or not _ad_lost_focus:
+		_ad_open_at = -1
+		_ad_focus_back = false
+		_ad_continue_pressed = false
 		return true
 	return false
 
 
-## (Desktop) Le joueur signale qu'il a regarde la pub (bouton "J'ai regarde").
+## Le joueur signale qu'il a regardé la pub (bouton "J'ai regardé").
 func desktop_mark_returned() -> void:
-	_desktop_continue_pressed = true
-	_desktop_focus_back = true
+	_ad_continue_pressed = true
+	_ad_focus_back = true
 
 
-## Precharger les pubs recompensees pour le prochain affichage.
+## Conservée pour compatibilité API (l'ancien flux Unity Ads préchargeait la
+## pub suivante ; Adsterra n'a rien à précharger, chaque affichage ouvre une
+## page fraîche avec cache-buster).
 func reload_rewarded() -> void:
-	if OS.get_name() != "Android":
-		return
-	var plugin = _get_plugin()
-	if plugin == null:
-		return
-	if _initialized:
-		plugin.loadRewarded(PLACEMENT_REWARDED)
+	pass
 
 
-## La pub recompensee est-elle prete ?
+## La pub récompensée est-elle prête ? Toujours vraie : pas de préchargement
+## nécessaire avec Adsterra (page générée à la volée).
 func is_rewarded_ready() -> bool:
-	if OS.get_name() != "Android":
-		return true
-	var plugin = _get_plugin()
-	if plugin == null:
-		return false
-	return plugin.isReady(PLACEMENT_REWARDED)
+	return true
 
 
 func reset_reward() -> void:
 	pass
 
 
-# --- Banniere en jeu (Android) -------------------------------------------
+# --- Bannière en jeu ------------------------------------------------------
 
-## Affiche la banniere Unity Ads pendant la partie (Android uniquement).
+## Affiche une bannière Adsterra en overlay pendant la partie, si une zone a
+## été configurée (ZONE_BANNER_SNIPPET). Contrairement à l'ancien système
+## Unity Ads (vue native superposée par le SDK), ceci est un simple visuel
+## HTML affiché par le jeu lui-même : voir Main.gd pour l'intégration
+## visuelle (control dédié en bas d'écran).
 func show_game_banner() -> void:
-	if OS.get_name() != "Android":
-		return
 	if not has_consent() or _banner_visible:
 		return
-	var plugin = _get_plugin()
-	if plugin == null:
-		return
-	if not _initialized:
+	if ZONE_BANNER_SNIPPET.is_empty():
 		return
 	_banner_visible = true
-	plugin.showBanner(PLACEMENT_BANNER, 0)
 
 
 func hide_game_banner() -> void:
-	if OS.get_name() != "Android":
-		return
-	if not _banner_visible:
-		return
-	var plugin = _get_plugin()
-	if plugin == null:
-		return
 	_banner_visible = false
-	plugin.hideBanner()
 
 
-# --- Interstitiels (Android) ---------------------------------------------
+func has_banner_content() -> bool:
+	return not ZONE_BANNER_SNIPPET.is_empty()
+
+
+# --- Interstitiels (Social Bar) -------------------------------------------
 
 ## Un interstitiel tous les INTERSTITIAL_EVERY_ZONES secteurs, avec cooldown.
-func maybe_show_interstitial(zone_index: int) -> void:
-	if OS.get_name() != "Android":
-		return
+## Contrairement à un vrai interstitiel plein écran (non disponible sans SDK
+## natif), ceci ouvre une pub Social Bar Adsterra dans le navigateur système
+## UNIQUEMENT si le joueur clique sur la notification en jeu (voir
+## Main.gd::_maybe_prompt_interstitial) -- jamais automatiquement.
+func maybe_show_interstitial(zone_index: int) -> bool:
 	if not has_consent():
-		return
+		return false
+	if ZONE_SOCIAL_BAR_SNIPPET.is_empty() and AD_SMARTLINK_URL.is_empty():
+		return false
 	if zone_index < INTERSTITIAL_EVERY_ZONES or zone_index % INTERSTITIAL_EVERY_ZONES != 0:
-		return
+		return false
 	var now: int = Time.get_ticks_msec()
 	if now - _last_interstitial_ms < INTERSTITIAL_COOLDOWN_MS:
-		return
+		return false
 	_last_interstitial_ms = now
-	var plugin = _get_plugin()
-	if plugin == null:
-		return
-	if not _initialized:
-		return
-	if not plugin.isReady(PLACEMENT_INTERSTITIAL):
-		plugin.loadInterstitial(PLACEMENT_INTERSTITIAL)
-		return
-	plugin.showInterstitial(PLACEMENT_INTERSTITIAL)
+	return true
 
 
-## Un interstitiel sur l'ecran de fin de partie (session >= 1 min), cooldown.
-func maybe_show_game_over_interstitial() -> void:
-	if OS.get_name() != "Android":
-		return
+## Un interstitiel sur l'écran de fin de partie (session >= 1 min), cooldown.
+func maybe_show_game_over_interstitial() -> bool:
 	if not has_consent():
-		return
+		return false
 	var now: int = Time.get_ticks_msec()
 	if now - _last_gameover_interstitial_ms < GAMEOVER_INTERSTITIAL_COOLDOWN_MS:
-		return
+		return false
 	_last_gameover_interstitial_ms = now
-	var plugin = _get_plugin()
-	if plugin == null:
-		return
-	if not _initialized:
-		return
-	if not plugin.isReady(PLACEMENT_INTERSTITIAL):
-		plugin.loadInterstitial(PLACEMENT_INTERSTITIAL)
-		return
-	plugin.showInterstitial(PLACEMENT_INTERSTITIAL)
+	return true
 
 
-# --- Desktop : page locale + navigateur -----------------------------------
+# --- Navigateur système : page locale + ouverture --------------------------
 
-## Genere une page HTML locale avec le code Unity Ads et l'ouvre dans le
-## navigateur systeme.
-func _open_desktop_ad() -> void:
-	_desktop_open_at = Time.get_ticks_msec()
-	_desktop_focus_back = false
-	_desktop_lost_focus = false
-	_desktop_continue_pressed = false
-	var url: String = ""
-	if _write_desktop_ad_page():
-		var path: String = (OS.get_user_data_dir() + "/" + DESKTOP_AD_PAGE_NAME).replace("\\", "/")
-		url = "file:///" + path
-	else:
-		url = DESKTOP_AD_PAGE_URL_FALLBACK
-	_log("[AdsManager] Ouverture de la pub (navigateur) : %s" % url)
+## Génère une page HTML locale avec le Direct Link Adsterra et l'ouvre dans
+## le navigateur système. Toujours déclenché par un clic explicite du
+## joueur (bouton x2 cristaux) -- jamais en tâche de fond.
+func _open_rewarded_ad() -> void:
+	_ad_open_at = Time.get_ticks_msec()
+	_ad_focus_back = false
+	_ad_lost_focus = false
+	_ad_continue_pressed = false
+	var url: String = AD_REWARDED_URL
+	if url.is_empty():
+		url = AD_SMARTLINK_URL
+	# Cache-buster pour eviter un affichage cache par le navigateur.
+	var cb: String = str(Time.get_ticks_usec())
+	var sep: String = "&" if url.contains("?") else "?"
+	url = "%s%s_cb=%s" % [url, sep, cb]
+	_log("[AdsManager] Ouverture de la pub récompensée (navigateur) : %s" % url)
 	OS.shell_open(url)
 
 
-## Choisit la prochaine zone Adsterra (round-robin) + cache-buster.
-func _pick_desktop_zone() -> String:
-	if DESKTOP_AD_ZONES.is_empty():
-		return ""
-	var snippet: String = str(DESKTOP_AD_ZONES[_desktop_rotation_index % DESKTOP_AD_ZONES.size()])
-	_desktop_rotation_index += 1
-	var cb: String = str(Time.get_ticks_usec())
-	var out: String = snippet
-	if out.contains("'params'"):
-		out = out.replace("'params' : {}", "'params' : {'cb' : '%s'}" % cb)
-		out = out.replace("'params': {}", "'params': {'cb' : '%s'}" % cb)
-	out = out.replace("invoke.js", "invoke.js?cb=" + cb)
-	return out
-
-
-func _write_desktop_ad_page() -> bool:
-	var snippet: String = _pick_desktop_zone()
-	var html: String = """<!DOCTYPE html>
-<html lang="fr">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>Astro Recolte - Annonce</title>
-<style>
-  html, body { margin:0; padding:0; background:#050a14; color:#cfe0ff; font-family:system-ui, sans-serif; }
-  body { min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:18px; }
-  .ad { width:100%; display:flex; align-items:center; justify-content:center; min-height:280px; }
-  .hint { font-size:14px; color:#7f92b8; text-align:center; padding:0 16px; }
-  .hint b { color:#ffd76b; }
-</style>
-</head>
-<body>
-  <div class="ad">""" + snippet + """</div>
-  <p class="hint">Merci de regarder l'annonce !<br>Retourne dans le jeu (ou appuie sur <b>J'ai regarde</b>) pour recevoir ton bonus.</p>
-</body>
-</html>"""
-	var file: FileAccess = FileAccess.open(OS.get_user_data_dir() + "/" + DESKTOP_AD_PAGE_NAME, FileAccess.WRITE)
-	if file == null:
-		return false
-	file.store_string(html)
-	file.close()
-	return true
+func get_status() -> String:
+	return "Adsterra (Direct Link) | consent=%s | pubs aujourd'hui: %d/%d | banniere=%s" % [
+		_consent, rewarded_views_today(), MAX_REWARDED_PER_DAY, _banner_visible,
+	]
 
 
 # --- Update notification -------------------------------------------------
@@ -502,38 +345,15 @@ func _save_notified() -> void:
 	config.save(NOTIFIED_SAVE_PATH)
 
 
-## Affiche une notification Android (menu deroulant) si une mise a jour
-## est disponible et qu'on ne l'a pas deja notifiee pour cette version.
+## Marque la version courante comme "notifiée" pour ne pas re-proposer sans
+## cesse le même changelog (le jeu affiche déjà une bannière/dialogue de mise
+## à jour dans l'UI -- voir UpdateChecker.gd -- donc pas de notification
+## système Android nécessaire ici, contrairement à l'ancien plugin Unity Ads
+## qui exposait notifyUpdate()).
 func notify_update_if_new() -> void:
-	if OS.get_name() != "Android":
-		return
 	if not UpdateChecker.update_available or not UpdateChecker.check_done:
 		return
 	if UpdateChecker.latest_code <= _notified_code:
 		return
-	var plugin = _get_plugin()
-	if plugin == null:
-		return
-	if not plugin.has_method("notifyUpdate"):
-		return
-	var lang: String = Settings.language if Settings.language != "" else "fr"
-	var title: String = "Astro Recolte"
-	var body: String = Settings.loc("update_body") % UpdateChecker.latest_version
-	plugin.notifyUpdate(title, body, UpdateChecker.download_url)
 	_notified_code = UpdateChecker.latest_code
 	_save_notified()
-
-
-func get_status() -> String:
-	var base: String
-	if OS.get_name() != "Android":
-		base = "Desktop: pub dans le navigateur (min %ds)" % int(REWARD_MIN_VIEW_S)
-	else:
-		var plugin = _get_plugin()
-		if plugin == null:
-			base = "Android: plugin UnityAds ABSENT - verifier le manifest + reinstaller l'APK"
-		else:
-			base = "Android: " + plugin.getStatus()
-	return "%s | consent=%s | pubs aujourd'hui: %d/%d | banniere=%s | init=%s" % [
-		base, _consent, rewarded_views_today(), MAX_REWARDED_PER_DAY, _banner_visible, _initialized,
-	]

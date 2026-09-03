@@ -62,6 +62,7 @@ const TRANSLATIONS: Dictionary = {
 		"ad_waiting": "Regarde la pub... %ds",
 		"ad_return": "Reviens au jeu pour recevoir ton bonus !",
 		"ad_continue": "J'ai regarde - Continuer",
+		"ad_interstitial_prompt": "Une pub t'interesse ? Clique ici (ou ferme).",
 		# Pause
 		"pause_title": "Pause",
 		"pause_status": "Score : %d  -  Temps : %ds",
@@ -275,6 +276,7 @@ const TRANSLATIONS: Dictionary = {
 		"ad_waiting": "Watch the ad... %ds",
 		"ad_return": "Return to the game to claim your bonus!",
 		"ad_continue": "I watched it - Continue",
+		"ad_interstitial_prompt": "Interested in an ad? Tap here (or close).",
 		# Pause
 		"pause_title": "Paused",
 		"pause_status": "Score: %d  -  Time: %ds",
