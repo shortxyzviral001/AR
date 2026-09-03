@@ -60,9 +60,11 @@ func should_check() -> bool:
 
 
 func _get_current_code() -> int:
-	# Read version code from the engine
-	var version_code: int = ProjectSettings.get_setting("application/config/version_code", 0) if ProjectSettings.has_setting("application/config/version_code") else 0
-	if version_code == 0:
-		# Fallback: read from export presets
-		version_code = 9  # Current known code
-	return version_code
+	# Lu depuis application/config/version_code (Project Settings), qui doit
+	# rester synchronise avec version/code dans export_presets.cfg a chaque
+	# release (voir project.godot). Avant ce correctif, ce ProjectSetting
+	# n'existait pas : la lecture echouait systematiquement et retombait sur
+	# une valeur "9" codee en dur, bien inferieure aux versions publiees
+	# recentes -> le jeu annoncait une mise a jour disponible en permanence,
+	# meme pour les joueurs deja a jour.
+	return ProjectSettings.get_setting("application/config/version_code", 1)

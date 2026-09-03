@@ -13,6 +13,11 @@ config_version=5
 config/name="Astro Recolte"
 run/main_scene="res://scenes/Main.tscn"
 config/features=PackedStringArray("4.7")
+config/version="1.22.0"
+; Garde cette valeur synchronisee avec version/code dans export_presets.cfg
+; a chaque nouvelle release (voir scripts/UpdateChecker.gd, qui la lit pour
+; savoir si une mise a jour est disponible).
+config/version_code=23
 boot_splash/bg_color=Color(0.02, 0.04, 0.1, 1)
 boot_splash/use_filter=false
 boot_splash/image="res://assets/splash_screen.png"

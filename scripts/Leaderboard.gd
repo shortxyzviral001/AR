@@ -5,8 +5,10 @@ extends Node
 ## Firestore est entierement gere par Google, seule la configuration
 ## (project ID + regles de securite) est a faire une fois, voir le README.
 ##
-## A FAIRE AVANT UTILISATION : remplace FIREBASE_PROJECT_ID par l'identifiant
-## de ton propre projet Firebase (section "Classement en ligne" du README).
+## FIREBASE_PROJECT_ID pointe deja vers le projet Firebase de production
+## (voir section "Classement en ligne" du README pour la configuration
+## complete : regles Firestore, etc.). Si tu forkes ce projet, change cette
+## valeur pour pointer vers TON propre projet Firebase.
 
 const FIREBASE_PROJECT_ID: String = "multidevsngl"
 const COLLECTION: String = "scores"
@@ -37,6 +39,13 @@ var _pending_elapsed: float = 0.0
 var _submit_stage: String = ""
 var _submit_retries: int = 0
 var _fetch_retries: int = 0
+
+
+## Journalise uniquement dans les builds de debug (export --debug / editeur) :
+## evite de polluer les logs des joueurs en production.
+static func _log(message: String) -> void:
+	if OS.is_debug_build():
+		print(message)
 
 
 func _ready() -> void:
@@ -144,7 +153,7 @@ func _send_write(exists_precondition: bool) -> void:
 # ---------------------------------------------------------------------------
 
 func _on_check_completed(result: int, response_code: int, _headers: PackedStringArray, _body: PackedByteArray) -> void:
-	print("[Leaderboard] check_pseudo -> result=%d response_code=%d" % [result, response_code])
+	_log("[Leaderboard] check_pseudo -> result=%d response_code=%d" % [result, response_code])
 	if result != HTTPRequest.RESULT_SUCCESS:
 		pseudo_check_result.emit(_pending_pseudo, "error")
 		return
@@ -158,13 +167,13 @@ func _on_check_completed(result: int, response_code: int, _headers: PackedString
 
 func _on_submit_completed(result: int, response_code: int, _headers: PackedStringArray, body: PackedByteArray) -> void:
 	var body_text: String = body.get_string_from_utf8()
-	print("[Leaderboard] submit (%s) -> result=%d code=%d" % [_submit_stage, result, response_code])
+	_log("[Leaderboard] submit (%s) -> result=%d code=%d" % [_submit_stage, result, response_code])
 
 	# Retry on transient errors (network timeout, server 5xx)
 	if result != HTTPRequest.RESULT_SUCCESS and _submit_retries < MAX_RETRIES:
 		_submit_retries += 1
 		score_submit_result.emit("retrying", _pending_score)
-		print("[Leaderboard] submit retry %d/%d" % [_submit_retries, MAX_RETRIES])
+		_log("[Leaderboard] submit retry %d/%d" % [_submit_retries, MAX_RETRIES])
 		await get_tree().create_timer(1.0 * _submit_retries).timeout
 		_send_write(_submit_stage == "update")
 		return
@@ -190,12 +199,12 @@ func _on_submit_completed(result: int, response_code: int, _headers: PackedStrin
 
 
 func _on_fetch_completed(result: int, response_code: int, _headers: PackedStringArray, body: PackedByteArray) -> void:
-	print("[Leaderboard] fetch_top -> result=%d response_code=%d" % [result, response_code])
+	_log("[Leaderboard] fetch_top -> result=%d response_code=%d" % [result, response_code])
 
 	# Retry on transient errors
 	if (result != HTTPRequest.RESULT_SUCCESS or response_code >= 500) and _fetch_retries < MAX_RETRIES:
 		_fetch_retries += 1
-		print("[Leaderboard] fetch retry %d/%d" % [_fetch_retries, MAX_RETRIES])
+		_log("[Leaderboard] fetch retry %d/%d" % [_fetch_retries, MAX_RETRIES])
 		await get_tree().create_timer(1.0 * _fetch_retries).timeout
 		_do_fetch_top()
 		return

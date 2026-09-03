@@ -1,10 +1,17 @@
-# GitHub Actions workflow template for AstroRecolte releases
-# Copie ce fichier dans .github/workflows/release.yml sur ton repo
+# NOTE: ce fichier est desormais un DOUBLON GARDE POUR REFERENCE.
+# Le vrai workflow actif est .github/workflows/release.yml : il exporte
+# et signe automatiquement l'APK (au lieu d'exiger de le pousser a la main),
+# via les secrets ANDROID_KEYSTORE_BASE64 / ANDROID_KEYSTORE_ALIAS /
+# ANDROID_KEYSTORE_PASSWORD. Voir les commentaires de ce fichier pour la
+# configuration a faire une seule fois sur GitHub.
+#
+# Version simplifiee ci-dessous, gardee a titre d'exemple si tu preferes
+# pousser l'APK toi-meme plutot que de laisser CI l'exporter :
 #
 # Usage:
-#   1. Pousse l'APK dans le repo
-#   2. Crée un tag (ex: v1.9.0)
-#   3. Le workflow crée automatiquement une GitHub Release avec l'APK
+#   1. Pousse l'APK dans le repo (ou genere-le dans ce workflow)
+#   2. Cree un tag (ex: v1.9.0)
+#   3. Le workflow cree automatiquement une GitHub Release avec l'APK
 #
 # Ou manuellement: Actions > Release > Run workflow > tag name
 
@@ -12,23 +19,23 @@ name: Create Release
 
 on:
   push:
-	tags:
-	  - 'v*'
+    tags:
+      - 'v*'
 
 jobs:
   release:
-	runs-on: ubuntu-latest
-	permissions:
-	  contents: write
-	steps:
-	  - uses: actions/checkout@v4
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
 
-	  - name: Create GitHub Release
-		uses: softprops/action-gh-release@v2
-		with:
-		  files: AstroRecolte.apk
-		  generate_release_notes: true
-		  draft: false
-		  prerelease: false
-		env:
-		  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: AstroRecolte.apk
+          generate_release_notes: true
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

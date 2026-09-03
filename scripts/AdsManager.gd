@@ -17,6 +17,13 @@
 ## Plafond quotidien : MAX_REWARDED_PER_DAY pubs recompensees par jour.
 extends Node
 
+## Journalise uniquement dans les builds de debug (export --debug / editeur) :
+## evite de polluer les logs (et la console `adb logcat`) des joueurs en
+## production tout en gardant les traces utiles pendant le developpement.
+static func _log(message: String) -> void:
+	if OS.is_debug_build():
+		print(message)
+
 # --- Unity Ads Configuration (Android) ------------------------------------
 # Game ID Unity Ads (depuis cloud.unity.com)
 const UNITY_GAME_ID: String = "800360647"
@@ -26,8 +33,8 @@ const PLACEMENT_INTERSTITIAL: String = "Interstitial_Android"
 const PLACEMENT_REWARDED: String = "Rewarded_Android"
 const PLACEMENT_BANNER: String = "Banner_Android"
 
-# Mode test (mettre a false en production)
-const TEST_MODE: bool = true  # TODO: repasser a false en production
+# Mode test (mettre a true uniquement pour du developpement local)
+const TEST_MODE: bool = false
 
 # --- Zones Adsterra (desktop fallback) ------------------------------------
 # Tags HTML/JS Adsterra utilises dans la page desktop (navigateur systeme).
@@ -101,7 +108,7 @@ func _ready() -> void:
 			push_warning("[AdsManager] Plugin UnityAds introuvable - pubs indisponibles")
 			_plugin_missing = true
 		else:
-			print("[AdsManager] Plugin UnityAds pret - initialisation...")
+			_log("[AdsManager] Plugin UnityAds pret - initialisation...")
 			var plugin = _get_plugin()
 			if plugin:
 				plugin.initialize(UNITY_GAME_ID, TEST_MODE)
@@ -130,7 +137,7 @@ func _notification(what: int) -> void:
 
 func _on_unity_initialized(success: bool) -> void:
 	if success:
-		print("[AdsManager] Unity Ads initialise avec succes")
+		_log("[AdsManager] Unity Ads initialise avec succes")
 		_initialized = true
 		# Precharger les pubs
 		_preload_ads()
@@ -150,7 +157,7 @@ func _preload_ads() -> void:
 
 
 func _on_rewarded_loaded(_placement: String) -> void:
-	print("[AdsManager] Pub recompensee pretee")
+	_log("[AdsManager] Pub recompensee pretee")
 
 
 func _on_rewarded_failed(_placement: String, error: String) -> void:
@@ -158,16 +165,16 @@ func _on_rewarded_failed(_placement: String, error: String) -> void:
 
 
 func _on_rewarded_completed(_placement: String) -> void:
-	print("[AdsManager] Pub recompensee terminee - recompense accordee")
+	_log("[AdsManager] Pub recompensee terminee - recompense accordee")
 	_reward_pending = true
 
 
 func _on_rewarded_hidden(_placement: String) -> void:
-	print("[AdsManager] Pub recompensee fermee")
+	_log("[AdsManager] Pub recompensee fermee")
 
 
 func _on_interstitial_loaded(_placement: String) -> void:
-	print("[AdsManager] Interstitiel prete")
+	_log("[AdsManager] Interstitiel prete")
 
 
 func _on_interstitial_failed(_placement: String, error: String) -> void:
@@ -175,7 +182,7 @@ func _on_interstitial_failed(_placement: String, error: String) -> void:
 
 
 func _on_banner_loaded(_placement: String) -> void:
-	print("[AdsManager] Banniere chargée")
+	_log("[AdsManager] Banniere chargée")
 
 
 func _on_banner_failed(_placement: String, error: String) -> void:
@@ -428,7 +435,7 @@ func _open_desktop_ad() -> void:
 		url = "file:///" + path
 	else:
 		url = DESKTOP_AD_PAGE_URL_FALLBACK
-	print("[AdsManager] Ouverture de la pub (navigateur) : ", url)
+	_log("[AdsManager] Ouverture de la pub (navigateur) : %s" % url)
 	OS.shell_open(url)
 
 
