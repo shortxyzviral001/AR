@@ -48,6 +48,8 @@ const CINE_BG_SCOURGE: Texture2D = preload("res://assets/cine/cine_bg_scourge.jp
 const CINE_BG_LAUNCH: Texture2D = preload("res://assets/cine/cine_bg_launch.jpg")
 const CINE_BG_INTRO: Texture2D = preload("res://assets/cine/cine_bg_intro.jpg")
 const MENU_BG_TEXTURE: Texture2D = preload("res://assets/menu_bg.jpg")
+const BTN_PRIMARY_TEXTURE: Texture2D = preload("res://assets/btn_primary.png")
+const BTN_SECONDARY_TEXTURE: Texture2D = preload("res://assets/btn_secondary.png")
 const TITLE_LOGO_TEXTURE: Texture2D = preload("res://assets/title_logo.png")
 const ZONE_BG_TEXTURES: Array[Texture2D] = [
 	preload("res://assets/zones/zone_bg_blue.jpg"),
@@ -859,41 +861,47 @@ func _build_theme() -> Theme:
 	panel_style.shadow_size = 18
 	theme.set_stylebox("panel", "PanelContainer", panel_style)
 
-	# -- Primary button (play, replay, confirm) -- aurore cyan-violet --
-	var btn_primary: StyleBoxFlat = StyleBoxFlat.new()
-	btn_primary.bg_color = COL_BTN_PRIMARY
-	btn_primary.set_corner_radius_all(14)
-	btn_primary.set_border_width_all(2)
-	btn_primary.border_color = Color(0.35, 0.85, 0.85, 0.65)
-	btn_primary.set_content_margin_all(12.0)
-	btn_primary.shadow_color = Color(0.35, 0.30, 0.85, 0.28)
-	btn_primary.shadow_size = 8
+	# -- Primary button (play, replay, confirm) -- capsule peinte degrade
+	# cyan->violet avec liseres neon, dans le style du mockup approuve
+	# (design_previews/ui_mockup_menu.png), au lieu d'un simple aplat
+	# de couleur code en dur.
+	var btn_primary: StyleBoxTexture = StyleBoxTexture.new()
+	btn_primary.texture = BTN_PRIMARY_TEXTURE
+	btn_primary.texture_margin_left = 60.0
+	btn_primary.texture_margin_right = 60.0
+	btn_primary.texture_margin_top = 14.0
+	btn_primary.texture_margin_bottom = 14.0
+	btn_primary.set_content_margin_all(14.0)
+	btn_primary.axis_stretch_horizontal = StyleBoxTexture.AXIS_STRETCH_MODE_STRETCH
+	btn_primary.axis_stretch_vertical = StyleBoxTexture.AXIS_STRETCH_MODE_STRETCH
+	btn_primary.modulate_color = Color(1.0, 1.0, 1.0, 1.0)
 
-	var btn_primary_hover: StyleBoxFlat = btn_primary.duplicate()
-	btn_primary_hover.bg_color = COL_BTN_PRIMARY_HOVER
-	btn_primary_hover.border_color = Color(0.45, 0.95, 0.90, 0.85)
+	var btn_primary_hover: StyleBoxTexture = btn_primary.duplicate()
+	btn_primary_hover.modulate_color = Color(1.18, 1.18, 1.18, 1.0)
 
-	var btn_primary_pressed: StyleBoxFlat = btn_primary.duplicate()
-	btn_primary_pressed.bg_color = COL_BTN_PRIMARY_PRESS
+	var btn_primary_pressed: StyleBoxTexture = btn_primary.duplicate()
+	btn_primary_pressed.modulate_color = Color(0.82, 0.82, 0.82, 1.0)
 
-	# -- Secondary button --
-	var btn_sec: StyleBoxFlat = StyleBoxFlat.new()
-	btn_sec.bg_color = COL_BTN_NORMAL
-	btn_sec.set_corner_radius_all(12)
-	btn_sec.set_border_width_all(2)
-	btn_sec.border_color = COL_PANEL_BORDER
-	btn_sec.set_content_margin_all(10.0)
+	# -- Secondary button -- meme capsule mais variante sombre/vitree --
+	var btn_sec: StyleBoxTexture = StyleBoxTexture.new()
+	btn_sec.texture = BTN_SECONDARY_TEXTURE
+	btn_sec.texture_margin_left = 60.0
+	btn_sec.texture_margin_right = 60.0
+	btn_sec.texture_margin_top = 14.0
+	btn_sec.texture_margin_bottom = 14.0
+	btn_sec.set_content_margin_all(12.0)
+	btn_sec.axis_stretch_horizontal = StyleBoxTexture.AXIS_STRETCH_MODE_STRETCH
+	btn_sec.axis_stretch_vertical = StyleBoxTexture.AXIS_STRETCH_MODE_STRETCH
+	btn_sec.modulate_color = Color(1.0, 1.0, 1.0, 1.0)
 
-	var btn_sec_hover: StyleBoxFlat = btn_sec.duplicate()
-	btn_sec_hover.bg_color = COL_BTN_HOVER
-	btn_sec_hover.border_color = Color(0.30, 0.60, 0.95, 0.70)
+	var btn_sec_hover: StyleBoxTexture = btn_sec.duplicate()
+	btn_sec_hover.modulate_color = Color(1.35, 1.35, 1.4, 1.0)
 
-	var btn_sec_pressed: StyleBoxFlat = btn_sec.duplicate()
-	btn_sec_pressed.bg_color = Color(0.04, 0.08, 0.16, 0.98)
+	var btn_sec_pressed: StyleBoxTexture = btn_sec.duplicate()
+	btn_sec_pressed.modulate_color = Color(0.75, 0.75, 0.8, 1.0)
 
-	var btn_disabled: StyleBoxFlat = btn_sec.duplicate()
-	btn_disabled.bg_color = Color(0.05, 0.06, 0.08, 0.65)
-	btn_disabled.border_color = Color(0.18, 0.20, 0.24, 0.35)
+	var btn_disabled: StyleBoxTexture = btn_sec.duplicate()
+	btn_disabled.modulate_color = Color(0.5, 0.5, 0.5, 0.6)
 
 	# Apply primary style to Button
 	theme.set_stylebox("normal", "Button", btn_primary)
@@ -924,11 +932,17 @@ func _build_theme() -> Theme:
 	theme.set_color("font_hover_color", "OptionButton", Color.WHITE)
 	theme.set_color("font_disabled_color", "OptionButton", Color("#505a6a"))
 
-	# -- LineEdit --
-	var le_style: StyleBoxFlat = btn_sec.duplicate()
+	# -- LineEdit -- reste un champ plat classique (pas une capsule bouton) --
+	var le_style: StyleBoxFlat = StyleBoxFlat.new()
 	le_style.bg_color = Color(0.03, 0.06, 0.12, 0.95)
+	le_style.set_corner_radius_all(12)
+	le_style.set_border_width_all(2)
+	le_style.border_color = COL_PANEL_BORDER
+	le_style.set_content_margin_all(10.0)
+	var le_style_focus: StyleBoxFlat = le_style.duplicate()
+	le_style_focus.border_color = Color(0.30, 0.60, 0.95, 0.70)
 	theme.set_stylebox("normal", "LineEdit", le_style)
-	theme.set_stylebox("focus", "LineEdit", btn_sec_hover)
+	theme.set_stylebox("focus", "LineEdit", le_style_focus)
 	theme.set_color("font_color", "LineEdit", COL_TEXT)
 	theme.set_color("font_placeholder_color", "LineEdit", Color("#5a6a80"))
 
@@ -1098,15 +1112,23 @@ func _make_action_button(text: String) -> Button:
 
 func _make_secondary_button(text: String) -> Button:
 	var button: Button = _make_action_button(text)
-	# Override with secondary styling
-	var sb: StyleBoxFlat = StyleBoxFlat.new()
-	sb.bg_color = COL_BTN_NORMAL; sb.set_corner_radius_all(12)
-	sb.set_border_width_all(2); sb.border_color = COL_PANEL_BORDER
+	# Meme capsule peinte neon (variante sombre) que les CheckButton/OptionButton
+	# du theme -- garde une apparence unifiee avec le mockup approuve au lieu
+	# d'un aplat de couleur code en dur qui ne correspondait plus au style
+	# des autres boutons de l'ecran.
+	var sb: StyleBoxTexture = StyleBoxTexture.new()
+	sb.texture = BTN_SECONDARY_TEXTURE
+	sb.texture_margin_left = 60.0
+	sb.texture_margin_right = 60.0
+	sb.texture_margin_top = 14.0
+	sb.texture_margin_bottom = 14.0
 	sb.set_content_margin_all(10.0)
+	sb.axis_stretch_horizontal = StyleBoxTexture.AXIS_STRETCH_MODE_STRETCH
+	sb.axis_stretch_vertical = StyleBoxTexture.AXIS_STRETCH_MODE_STRETCH
 	button.add_theme_stylebox_override("normal", sb)
-	var sb_h: StyleBoxFlat = sb.duplicate(); sb_h.bg_color = COL_BTN_HOVER
+	var sb_h: StyleBoxTexture = sb.duplicate(); sb_h.modulate_color = Color(1.35, 1.35, 1.4, 1.0)
 	button.add_theme_stylebox_override("hover", sb_h)
-	var sb_p: StyleBoxFlat = sb.duplicate(); sb_p.bg_color = Color(0.04, 0.08, 0.16, 0.98)
+	var sb_p: StyleBoxTexture = sb.duplicate(); sb_p.modulate_color = Color(0.75, 0.75, 0.8, 1.0)
 	button.add_theme_stylebox_override("pressed", sb_p)
 	return button
 
