@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96">
+  <defs>
+    <radialGradient id="halo" cx="50%" cy="46%" r="55%">
+      <stop offset="0" stop-color="#7dffce" stop-opacity="0.5"/>
+      <stop offset="1" stop-color="#7dffce" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="heart" x1="0.2" x2="0.75" y1="0" y2="1">
+      <stop offset="0" stop-color="#d8fff0"/>
+      <stop offset="0.45" stop-color="#63e8b3"/>
+      <stop offset="1" stop-color="#159466"/>
+    </linearGradient>
+  </defs>
+
+  <circle cx="48" cy="46" r="42" fill="url(#halo)"/>
+
+  <path d="M48 84 C29 68 13 55 13 35 C13 22 23 13 35 13 C42 13 46 17 48 23 C50 17 56 13 63 13 C75 13 85 22 85 35 C85 55 67 68 48 84 Z"
+        fill="url(#heart)" stroke="#eefffa" stroke-width="5" stroke-linejoin="round"/>
+
+  <path d="M35 23 C28 23 21 29 21 38" fill="none" stroke="#ffffff" stroke-width="5.5" stroke-linecap="round" opacity="0.7"/>
+  <ellipse cx="34" cy="30" rx="7" ry="4" fill="#ffffff" opacity="0.55" transform="rotate(-32 34 30)"/>
+</svg>

@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="40%" r="75%">
+      <stop offset="0" stop-color="#1c3a7a"/>
+      <stop offset="0.55" stop-color="#0c1c42"/>
+      <stop offset="1" stop-color="#050914"/>
+    </radialGradient>
+    <linearGradient id="body" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0" stop-color="#f2feff"/>
+      <stop offset="0.45" stop-color="#7cc4ff"/>
+      <stop offset="1" stop-color="#2456c9"/>
+    </linearGradient>
+    <radialGradient id="cockpit" cx="38%" cy="30%" r="75%">
+      <stop offset="0" stop-color="#eafcff"/>
+      <stop offset="0.4" stop-color="#8fe3ff"/>
+      <stop offset="1" stop-color="#061421"/>
+    </radialGradient>
+    <linearGradient id="flame" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0" stop-color="#ffe98a"/>
+      <stop offset="1" stop-color="#ff5b32"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="192" height="192" rx="40" fill="url(#bg)"/>
+  <circle cx="53" cy="147" r="1.8" fill="#bfe3ff" opacity="0.55"/>
+  <circle cx="158" cy="58" r="1.4" fill="#bfe3ff" opacity="0.5"/>
+
+  <path d="M96.0 44.4 L124.4 97.7 L151.1 111.2 L131.1 104.4 L111.2 146.7 L96.0 133.2 L80.8 146.7 L60.9 104.4 L40.9 111.2 L67.6 97.7 Z"
+        fill="url(#body)" stroke="#eafbff" stroke-width="4" stroke-linejoin="round"/>
+
+  <circle cx="96" cy="78" r="15" fill="url(#cockpit)" stroke="#e5faff" stroke-width="3.5"/>
+  <ellipse cx="91" cy="72" rx="5" ry="3.2" fill="#ffffff" opacity="0.75" transform="rotate(-28 91 72)"/>
+
+  <circle cx="151" cy="111" r="4" fill="#3bffb0"/>
+  <circle cx="41" cy="111" r="4" fill="#3bffb0"/>
+
+  <path d="M88 134 C90 141 93 147 96 153 C99 147 102 141 104 134 C100 137 92 137 88 134 Z" fill="url(#flame)"/>
+</svg>

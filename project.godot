@@ -1,0 +1,45 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=5
+
+[application]
+
+config/name="Astro Recolte"
+run/main_scene="res://scenes/Main.tscn"
+config/features=PackedStringArray("4.7")
+boot_splash/bg_color=Color(0.02, 0.04, 0.1, 1)
+boot_splash/use_filter=false
+boot_splash/image="res://assets/splash_screen.png"
+config/icon="res://assets/icon_main.svg"
+
+[autoload]
+
+Settings="*res://scripts/Settings.gd"
+Leaderboard="*res://scripts/Leaderboard.gd"
+Shop="*res://scripts/Shop.gd"
+Audio="*res://scripts/Audio.gd"
+AdsManager="*res://scripts/AdsManager.gd"
+UpdateChecker="*res://scripts/UpdateChecker.gd"
+
+[display]
+
+window/size/viewport_width=960
+window/size/viewport_height=540
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
+
+[input_devices]
+
+pointing/emulate_touch_from_mouse=true
+
+[rendering]
+
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+textures/vram_compression/import_etc2_astc=true

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Astro Récolte — Télécharger</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(135deg, #07101f 0%, #150b28 50%, #041a14 100%);
+            color: #edf7ff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .card {
+            background: rgba(0.10, 0.14, 0.28, 0.92);
+            border: 2px solid rgba(0.0, 0.20, 0.38, 0.55);
+            border-radius: 24px;
+            padding: 48px 40px;
+            max-width: 480px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 0 60px rgba(0.10, 0.20, 0.45, 0.3);
+        }
+        .logo { font-size: 64px; margin-bottom: 16px; }
+        h1 {
+            font-size: 36px;
+            margin-bottom: 8px;
+            background: linear-gradient(90deg, #ffffff, #00c8ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .subtitle { color: #8fa4c0; font-size: 16px; margin-bottom: 32px; }
+        .version {
+            display: inline-block;
+            background: rgba(0.0, 0.38, 0.62, 0.5);
+            border: 1px solid #00b8e6;
+            border-radius: 8px;
+            padding: 6px 16px;
+            font-size: 14px;
+            color: #00c8ff;
+            margin-bottom: 28px;
+        }
+        .download-btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #00c8ff, #0088bb);
+            color: #fff;
+            font-size: 20px;
+            font-weight: 600;
+            padding: 16px 48px;
+            border-radius: 14px;
+            text-decoration: none;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 20px rgba(0.0, 0.8, 1.0, 0.3);
+        }
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px rgba(0.0, 0.8, 1.0, 0.5);
+        }
+        .info { color: #8fa4c0; font-size: 13px; margin-top: 24px; line-height: 1.6; }
+        .features {
+            text-align: left;
+            margin: 28px 0;
+            padding: 20px 24px;
+            background: rgba(0.0, 0.0, 0.0, 0.3);
+            border-radius: 14px;
+            border: 1px solid rgba(0.0, 0.20, 0.38, 0.3);
+        }
+        .features h3 { color: #00c8ff; font-size: 14px; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; }
+        .features li { color: #b8c8e0; font-size: 14px; margin-bottom: 6px; list-style: none; }
+        .features li::before { content: "✦ "; color: #ffcc4d; }
+        .footer { margin-top: 24px; color: #505a6a; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="logo">🚀</div>
+        <h1>Astro Récolte</h1>
+        <p class="subtitle">Arcade spatial — Attrape les étoiles, bats les boss</p>
+        <div class="version" id="version-badge">v1.9.0</div>
+        <br>
+        <a class="download-btn" id="download-btn" href="#">⬇ Télécharger l'APK</a>
+        <div class="features">
+            <h3>Contenu</h3>
+            <ul>
+                <li>Gameplay arcade infini avec 5 secteurs</li>
+                <li>Boss uniques avec patterns de tir</li>
+                <li>1000+ ensembles cosmétiques</li>
+                <li>Classement en ligne</li>
+                <li>Publicités opt-in uniquement (x2 cristaux)</li>
+            </ul>
+        </div>
+        <p class="info">
+            Android 7.0+ • ~100 Mo • Aucune permission dangereuse<br>
+            Pas de SDK publicitaire installé silencieusement.<br>
+            Les pubs n'apparaissent que si vous choisissez de regarder.
+        </p>
+        <p class="footer">© multidevsn — Fait avec Godot Engine</p>
+    </div>
+    <script>
+        // Auto-fetch latest version from version.json
+        fetch('version.json')
+            .then(r => r.json())
+            .then(data => {
+                document.getElementById('version-badge').textContent = 'v' + data.latest_version;
+                document.getElementById('download-btn').href = data.download_url;
+                document.getElementById('download-btn').target = '_blank';
+            })
+            .catch(() => {});
+    </script>
+</body>
+</html>

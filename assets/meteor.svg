@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="112" height="112" viewBox="0 0 112 112">
+  <defs>
+    <linearGradient id="rock" x1="0.15" x2="0.9" y1="0.1" y2="0.95">
+      <stop offset="0" stop-color="#c98f6d"/>
+      <stop offset="0.5" stop-color="#8a5a4a"/>
+      <stop offset="1" stop-color="#3c2530"/>
+    </linearGradient>
+    <linearGradient id="ember" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#ffe98a"/>
+      <stop offset="1" stop-color="#ff4f36"/>
+    </linearGradient>
+    <radialGradient id="crater" cx="35%" cy="30%" r="75%">
+      <stop offset="0" stop-color="#5a3a40"/>
+      <stop offset="1" stop-color="#241318"/>
+    </radialGradient>
+  </defs>
+
+  <path d="M14 31 C4 23 2 13 4 5 C18 9 30 17 38 28 Z" fill="url(#ember)" opacity="0.9"/>
+  <path d="M6 45 C-3 40 -8 32 -8 24 C2 26 12 32 18 40 Z" fill="url(#ember)" opacity="0.65"/>
+  <path d="M85 16 C95 9 105 6 111 8 C107 21 98 30 88 36 Z" fill="url(#ember)" opacity="0.85"/>
+
+  <path d="M49.2 17.6 L70.0 22.7 L92.7 30.7 L90.8 54.9 L92.6 77.9 L73.6 91.6 L52.2 90.4 L29.4 88.7 L23.5 66.7 L16.4 45.7 L32.4 30.5 Z"
+        fill="url(#rock)" stroke="#ffcf9e" stroke-width="3.5" stroke-linejoin="round"/>
+
+  <path d="M32.4 30.5 L49.2 17.6 L70.0 22.7" fill="none" stroke="#ffe3bb" stroke-width="2.6" stroke-linecap="round" opacity="0.55"/>
+
+  <ellipse cx="44" cy="42" rx="11" ry="9" fill="url(#crater)" transform="rotate(-15 44 42)"/>
+  <path d="M36 36 A11 9 0 0 1 50 35" fill="none" stroke="#e2b18f" stroke-width="1.6" opacity="0.4"/>
+  <ellipse cx="70" cy="60" rx="13" ry="11" fill="url(#crater)" transform="rotate(10 70 60)"/>
+  <path d="M60 54 A13 11 0 0 1 78 55" fill="none" stroke="#e2b18f" stroke-width="1.6" opacity="0.35"/>
+  <ellipse cx="55" cy="78" rx="7" ry="6" fill="url(#crater)"/>
+  <circle cx="76" cy="40" r="4.2" fill="url(#crater)" opacity="0.85"/>
+</svg>

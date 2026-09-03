@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Astro Recolte - Annonce</title>
+<style>
+  html, body { margin:0; padding:0; background:#050a14; color:#cfe0ff; font-family:system-ui, sans-serif; }
+  body { min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:18px; }
+  .ad { width:100%; display:flex; align-items:center; justify-content:center; min-height:280px; }
+  .hint { font-size:14px; color:#7f92b8; text-align:center; padding:0 16px; }
+  .hint b { color:#ffd76b; }
+</style>
+</head>
+<body>
+  <div class="ad">
+    <script>
+      atOptions = {
+        'key' : 'f4572b309ba38734770ce69a48a06606',
+        'format' : 'iframe',
+        'height' : 250,
+        'width' : 300,
+        'params' : { 'cb' : Date.now() }
+      };
+      (function () {
+        var s = document.createElement('script');
+        // Cache-buster : force le serveur Adsterra a servir un creatif different.
+        s.src = 'https://www.highperformanceformat.com/f4572b309ba38734770ce69a48a06606/invoke.js?cb=' + Date.now();
+        document.currentScript.parentNode.insertBefore(s, document.currentScript.nextSibling);
+      })();
+    </script>
+    <noscript><p>Votre navigateur doit accepter JavaScript pour afficher l'annonce.</p></noscript>
+  </div>
+  <p class="hint">Merci de regarder l'annonce !<br>Retourne dans le jeu (ou appuie sur <b>J'ai regarde</b>) pour recevoir ton bonus.</p>
+</body>
+</html>

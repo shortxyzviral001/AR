@@ -1,0 +1,8 @@
+{
+  "latest_version": "1.22.0",
+  "latest_code": 23,
+  "download_url": "https://dub.sh/uSI78jH",
+  "changelog": {
+	"1.22.0": "Signature fix: APK now signs with Godot's debug keystore for compatibility with all existing installations. 4 ABIs included. Fixed install error on Android and BlueStacks."
+  }
+}

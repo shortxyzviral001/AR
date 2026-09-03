@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <defs>
+    <radialGradient id="aura" cx="50%" cy="52%" r="58%">
+      <stop offset="0" stop-color="#a8e6ff" stop-opacity="0.5"/>
+      <stop offset="1" stop-color="#a8e6ff" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="body" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.5" stop-color="#eaf3ff"/>
+      <stop offset="1" stop-color="#c7d8ec"/>
+    </linearGradient>
+    <radialGradient id="cockpit" cx="38%" cy="30%" r="75%">
+      <stop offset="0" stop-color="#eafcff"/>
+      <stop offset="0.4" stop-color="#8fe3ff"/>
+      <stop offset="1" stop-color="#061421"/>
+    </radialGradient>
+    <radialGradient id="pod" cx="35%" cy="30%" r="70%">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#aebfd8"/>
+    </radialGradient>
+    <linearGradient id="flame" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#ff8a3d"/>
+    </linearGradient>
+  </defs>
+
+  <circle cx="64" cy="72" r="56" fill="url(#aura)"/>
+
+  <path d="M64 18 L98 58 L116 76 L92 82 L76 121 L68 104 L64 110 L60 104 L52 121 L36 82 L12 76 L30 58 Z"
+        fill="url(#body)" stroke="#ffffff" stroke-width="3.4" stroke-linejoin="round"/>
+
+  <ellipse cx="110" cy="77" rx="9" ry="6" fill="url(#pod)" stroke="#ffffff" stroke-width="2"/>
+  <ellipse cx="18" cy="77" rx="9" ry="6" fill="url(#pod)" stroke="#ffffff" stroke-width="2"/>
+
+  <circle cx="64" cy="56" r="13" fill="url(#cockpit)" stroke="#e5faff" stroke-width="3.4"/>
+  <ellipse cx="59" cy="50" rx="4.6" ry="3" fill="#ffffff" opacity="0.8" transform="rotate(-28 59 50)"/>
+
+  <circle cx="110" cy="80" r="2.8" fill="#3bffb0"/>
+  <circle cx="18" cy="80" r="2.8" fill="#3bffb0"/>
+
+  <path d="M108 79 C110 84 111 89 110 93 C108 89 106 84 106 79 Z" fill="url(#flame)" opacity="0.9"/>
+  <path d="M20 79 C22 84 23 89 22 93 C20 89 18 84 18 79 Z" fill="url(#flame)" opacity="0.9"/>
+  <path d="M57 104 C59 111 61 117 64 122 C67 117 69 111 71 104 C68 108 60 108 57 104 Z" fill="url(#flame)"/>
+</svg>
