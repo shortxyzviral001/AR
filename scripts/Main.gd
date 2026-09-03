@@ -172,6 +172,7 @@ var _hud_currency: Label
 # Menu screens
 var _menu_root: Control
 var _menu_shade: ColorRect
+var _menu_background: TextureRect
 var _screen_language: Control
 var _screen_start: Control
 var _screen_pseudo: Control
@@ -972,6 +973,7 @@ func _create_menu() -> void:
 	menu_bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	menu_bg.modulate = Color(0.62, 0.62, 0.7, 1.0)
 	_menu_root.add_child(menu_bg)
+	_menu_background = menu_bg
 
 	var shade: ColorRect = ColorRect.new()
 	shade.name = "Shade"
@@ -1036,6 +1038,13 @@ func _show_screen(screen: Control) -> void:
 	if _screen_tutorial != null: _screen_tutorial.visible = screen == _screen_tutorial
 	if _screen_consent != null: _screen_consent.visible = screen == _screen_consent
 	if _menu_shade != null: _menu_shade.visible = screen != null
+	# CRITIQUE : le fond peint du menu est opaque (JPEG). S'il reste visible
+	# en permanence (comme avant ce correctif), il masque TOUT le jeu
+	# (HUD, vaisseau, ennemis) des que le menu se ferme (_show_screen(null)
+	# au lancement d'une partie) puisqu'il est ajoute sur un CanvasLayer
+	# au-dessus de la scene de jeu. Il ne doit donc etre visible que quand
+	# un ecran de menu l'est reellement.
+	if _menu_background != null: _menu_background.visible = screen != null
 	if screen != null:
 		_dismiss_interstitial_prompt()
 
