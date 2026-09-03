@@ -48,6 +48,8 @@ const CINE_BG_SCOURGE: Texture2D = preload("res://assets/cine/cine_bg_scourge.jp
 const CINE_BG_LAUNCH: Texture2D = preload("res://assets/cine/cine_bg_launch.jpg")
 const CINE_BG_INTRO: Texture2D = preload("res://assets/cine/cine_bg_intro.jpg")
 const SETTINGS_BG_TEXTURE: Texture2D = preload("res://assets/cine/settings_bg.jpg")
+const MENU_BG_TEXTURE: Texture2D = preload("res://assets/menu_bg.jpg")
+const TITLE_LOGO_TEXTURE: Texture2D = preload("res://assets/title_logo.png")
 const ZONE_BG_TEXTURES: Array[Texture2D] = [
 	preload("res://assets/zones/zone_bg_blue.jpg"),
 	preload("res://assets/zones/zone_bg_violet.jpg"),
@@ -958,6 +960,20 @@ func _create_menu() -> void:
 	_menu_root.theme = _build_theme()
 	layer.add_child(_menu_root)
 
+	# Fond spatial peint (nebuleuses cyan/violette + planetes), commun a
+	# tous les ecrans de menu (start, pause, boutique, classement, etc.)
+	# pour que la navigation reste visuellement cohérente et ne retombe
+	# jamais sur un simple aplat noir.
+	var menu_bg: TextureRect = TextureRect.new()
+	menu_bg.name = "MenuBackground"
+	menu_bg.texture = MENU_BG_TEXTURE
+	menu_bg.set_anchors_preset(Control.PRESET_FULL_RECT)
+	menu_bg.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	menu_bg.stretch_mode = TextureRect.STRETCH_SCALE
+	menu_bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	menu_bg.modulate = Color(0.62, 0.62, 0.7, 1.0)
+	_menu_root.add_child(menu_bg)
+
 	var shade: ColorRect = ColorRect.new()
 	shade.name = "Shade"
 	shade.color = COL_SHADE
@@ -1199,7 +1215,15 @@ func _build_start_screen() -> Control:
 	box.add_theme_constant_override("separation", 14)
 	panel.add_child(box)
 
-	box.add_child(_make_title(Settings.loc("start_title")))
+	# Logo peint "ASTRO RECOLTE" (image) a la place du simple Label texte.
+	var logo_center: CenterContainer = CenterContainer.new()
+	var logo: TextureRect = TextureRect.new()
+	logo.texture = TITLE_LOGO_TEXTURE
+	logo.custom_minimum_size = Vector2(320.0, 176.0)
+	logo.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
+	logo.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	logo_center.add_child(logo)
+	box.add_child(logo_center)
 
 	_start_body = _make_body_label()
 	box.add_child(_start_body)
