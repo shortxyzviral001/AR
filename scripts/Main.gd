@@ -47,7 +47,6 @@ const CINE_BG_SIGNAL: Texture2D = preload("res://assets/cine/cine_bg_signal.jpg"
 const CINE_BG_SCOURGE: Texture2D = preload("res://assets/cine/cine_bg_scourge.jpg")
 const CINE_BG_LAUNCH: Texture2D = preload("res://assets/cine/cine_bg_launch.jpg")
 const CINE_BG_INTRO: Texture2D = preload("res://assets/cine/cine_bg_intro.jpg")
-const SETTINGS_BG_TEXTURE: Texture2D = preload("res://assets/cine/settings_bg.jpg")
 const MENU_BG_TEXTURE: Texture2D = preload("res://assets/menu_bg.jpg")
 const TITLE_LOGO_TEXTURE: Texture2D = preload("res://assets/title_logo.png")
 const ZONE_BG_TEXTURES: Array[Texture2D] = [
@@ -1577,9 +1576,10 @@ func _build_settings_screen() -> Control:
 	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
 	screen.add_child(bg)
 
-	# AI nebula background (subtle depth, keeps text readable)
+	# AI nebula background (subtle depth, keeps text readable) - meme
+	# image que le reste des ecrans de menu pour rester coherent.
 	var nebula: TextureRect = TextureRect.new()
-	nebula.texture = SETTINGS_BG_TEXTURE
+	nebula.texture = MENU_BG_TEXTURE
 	nebula.set_anchors_preset(Control.PRESET_FULL_RECT)
 	nebula.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	nebula.modulate = Color(1.0, 1.0, 1.0, 0.28)
