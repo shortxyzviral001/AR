@@ -125,11 +125,11 @@ const ZONE_SPEED_MULT_STEP: float = 0.10
 const ZONE_SPEED_MULT_MAX: float = 1.5
 
 const ZONE_THEMES: Array[Dictionary] = [
-	{"name": "Ceinture Bleue", "bg": Color("#07101f"), "star_tint": Color(1.0, 1.0, 1.0), "meteor_tint": Color(1.0, 1.0, 1.0), "boss_name": "Sentinelle Azur"},
-	{"name": "Nebuleuse Violette", "bg": Color("#150b28"), "star_tint": Color(0.82, 0.68, 1.15), "meteor_tint": Color(0.88, 0.78, 1.15), "boss_name": "Devoreur Pourpre"},
-	{"name": "Ceinture Ambree", "bg": Color("#201207"), "star_tint": Color(1.15, 0.92, 0.65), "meteor_tint": Color(1.15, 0.98, 0.72), "boss_name": "Colosse Ambre"},
-	{"name": "Zone Cramoisie", "bg": Color("#240710"), "star_tint": Color(1.2, 0.68, 0.72), "meteor_tint": Color(1.2, 0.72, 0.78), "boss_name": "Faucheur Ecarlate"},
-	{"name": "Abysses Emeraude", "bg": Color("#041a14"), "star_tint": Color(0.68, 1.15, 0.9), "meteor_tint": Color(0.72, 1.2, 0.95), "boss_name": "Gardien Emeraude"},
+	{"name": "Constellation Bleue", "bg": Color("#07101f"), "star_tint": Color(1.0, 1.0, 1.0), "meteor_tint": Color(1.0, 1.0, 1.0), "boss_name": "Gardien Azur Corrompu"},
+	{"name": "Nebuleuse Violette", "bg": Color("#150b28"), "star_tint": Color(0.82, 0.68, 1.15), "meteor_tint": Color(0.88, 0.78, 1.15), "boss_name": "Ombre Pourpre"},
+	{"name": "Constellation Ambree", "bg": Color("#201207"), "star_tint": Color(1.15, 0.92, 0.65), "meteor_tint": Color(1.15, 0.98, 0.72), "boss_name": "Eclat Corrompu"},
+	{"name": "Voile Cramoisi", "bg": Color("#240710"), "star_tint": Color(1.2, 0.68, 0.72), "meteor_tint": Color(1.2, 0.72, 0.78), "boss_name": "Heraut de l'Eclipse"},
+	{"name": "Abysses Emeraude", "bg": Color("#041a14"), "star_tint": Color(0.68, 1.15, 0.9), "meteor_tint": Color(0.72, 1.2, 0.95), "boss_name": "Fragment de l'Eclipse"},
 ]
 
 # ---------------------------------------------------------------------------
@@ -1975,6 +1975,8 @@ func _build_tutorial_screen() -> Control:
 		Settings.loc("tutorial_step4"),
 		Settings.loc("tutorial_step5"),
 		Settings.loc("tutorial_step6"),
+		Settings.loc("tutorial_step7"),
+		Settings.loc("tutorial_step8"),
 	]
 	for i in range(steps.size()):
 		var line: Label = _make_body_label()
@@ -4511,9 +4513,9 @@ func _play_zone_transition_cinematic(zone_index: int) -> void:
 
 	# --- Phase 4: Sector number types in ---
 	var cycle: int = (zone_index / 5) + 1
-	var sub_text: String = "SECTEUR %d" % (zone_index + 1)
+	var sub_text: String = "%s %d" % [Settings.loc("sector_word"), zone_index + 1]
 	if cycle > 1:
-		sub_text += " — Cycle %d" % cycle
+		sub_text += " — %s %d" % [Settings.loc("cycle_word"), cycle]
 	_cine_subtitle_label.text = ""
 	_cine_subtitle_label.modulate.a = 1.0
 	_cine_subtitle_label.visible = true
@@ -4573,9 +4575,9 @@ func _apply_zone(index: int, announce: bool) -> void:
 	if announce:
 		Audio.play_sfx("zone")
 		var cycle: int = (index / ZONE_THEMES.size()) + 1
-		var banner_text: String = "SECTEUR %d - %s" % [index + 1, String(theme.get("name", ""))]
+		var banner_text: String = "%s %d - %s" % [Settings.loc("sector_word"), index + 1, String(theme.get("name", ""))]
 		if cycle > 1:
-			banner_text += " (Cycle %d)" % cycle
+			banner_text += " (%s %d)" % [Settings.loc("cycle_word"), cycle]
 		_show_zone_banner(banner_text)
 
 
