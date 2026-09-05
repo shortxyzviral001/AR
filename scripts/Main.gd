@@ -869,8 +869,14 @@ func _build_theme() -> Theme:
 	btn_primary.texture = BTN_PRIMARY_TEXTURE
 	btn_primary.texture_margin_left = 60.0
 	btn_primary.texture_margin_right = 60.0
-	btn_primary.texture_margin_top = 14.0
-	btn_primary.texture_margin_bottom = 14.0
+	# Marges verticales quasi nulles (au lieu de 14px) : la capsule est un
+	# "stade" droit en haut/bas et arrondi seulement a gauche/droite, donc
+	# aucun decoupage en 9-slices n'est necessaire verticalement. Avec une
+	# marge de 14px, la bande centrale etiree verticalement se comprimait a
+	# l'ecran (bouton ~54px de haut) et deformait la capsule en losange
+	# pointu ; 1px evite tout decoupage vertical tout en restant non-nul.
+	btn_primary.texture_margin_top = 1.0
+	btn_primary.texture_margin_bottom = 1.0
 	btn_primary.set_content_margin_all(14.0)
 	btn_primary.axis_stretch_horizontal = StyleBoxTexture.AXIS_STRETCH_MODE_STRETCH
 	btn_primary.axis_stretch_vertical = StyleBoxTexture.AXIS_STRETCH_MODE_STRETCH
@@ -883,12 +889,14 @@ func _build_theme() -> Theme:
 	btn_primary_pressed.modulate_color = Color(0.82, 0.82, 0.82, 1.0)
 
 	# -- Secondary button -- meme capsule mais variante sombre/vitree --
+	# (marges verticales quasi nulles : voir commentaire sur btn_primary
+	# ci-dessus, meme raison / meme forme de capsule.)
 	var btn_sec: StyleBoxTexture = StyleBoxTexture.new()
 	btn_sec.texture = BTN_SECONDARY_TEXTURE
 	btn_sec.texture_margin_left = 60.0
 	btn_sec.texture_margin_right = 60.0
-	btn_sec.texture_margin_top = 14.0
-	btn_sec.texture_margin_bottom = 14.0
+	btn_sec.texture_margin_top = 1.0
+	btn_sec.texture_margin_bottom = 1.0
 	btn_sec.set_content_margin_all(12.0)
 	btn_sec.axis_stretch_horizontal = StyleBoxTexture.AXIS_STRETCH_MODE_STRETCH
 	btn_sec.axis_stretch_vertical = StyleBoxTexture.AXIS_STRETCH_MODE_STRETCH
@@ -1107,6 +1115,11 @@ func _make_action_button(text: String) -> Button:
 	button.text = text
 	button.custom_minimum_size = Vector2(260.0, 50.0)
 	button.add_theme_font_size_override("font_size", 18)
+	# Empeche le bouton de s'etirer pour remplir toute la largeur de son
+	# VBoxContainer parent (comportement par defaut FILL) -- cet etirement
+	# deformait la capsule 9-slice peinte (ex. ecran pseudo : 356px de large
+	# affiches au lieu des 260px prevus), l'ecrasant en forme de losange.
+	button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	return button
 
 
@@ -1118,6 +1131,12 @@ func _make_secondary_button(text: String) -> Button:
 	# des autres boutons de l'ecran.
 	var sb: StyleBoxTexture = StyleBoxTexture.new()
 	sb.texture = BTN_SECONDARY_TEXTURE
+	# Marges de 9-slices en PIXELS SOURCE inchangees : la texture a ete
+	# regeneree en IA a une resolution native ~3x superieure (meme cadrage,
+	# meme ratio d'aspect) pour eviter le flou sur grand ecran, mais Godot
+	# echantillonne les marges en pixels de destination (ecran), pas en
+	# pixels source proportionnels -- les scaler x3 fait deborder les coins
+	# et pince la capsule. Les valeurs d'origine restent donc correctes.
 	sb.texture_margin_left = 60.0
 	sb.texture_margin_right = 60.0
 	sb.texture_margin_top = 14.0
