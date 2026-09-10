@@ -262,6 +262,9 @@ var _boss_sprite: Sprite2D = null
 var _boss_state: String = ""
 var _boss_fire_timer: float = 0.0
 var _boss_pattern_step: int = 0
+var _boss_phase: int = 1
+var _boss_charging: bool = false
+var _boss_charge_timer: float = 0.0
 var _boss_name_label: Label
 var _boss_bar_bg: ColorRect
 var _boss_bar_fill: ColorRect
@@ -3427,6 +3430,7 @@ func _spawn_boss() -> void:
 	_boss.area_entered.connect(_on_boss_area_entered)
 	add_child(_boss)
 	_boss_state = "entering"; _boss_fire_timer = 1.4; _boss_pattern_step = 0
+	_boss_phase = 1; _boss_charging = false; _boss_charge_timer = 0.0
 	_boss_name_label.text = String(theme.get("boss_name", "Boss"))
 	_set_boss_hud_visible(true)
 	_update_boss_bar()
@@ -3442,18 +3446,53 @@ func _update_boss(delta: float) -> void:
 		if _boss.position.y >= BOSS_HOVER_Y: _boss_state = "fighting"
 		return
 	if _boss_state != "fighting": return
-	var t: float = _elapsed * 0.6
+	var t: float = _elapsed * 0.6 * (1.0 + float(_boss_phase - 1) * 0.25)
 	_boss.position.x = clampf(size.x * 0.5 + sin(t) * (size.x * 0.5 - 90.0), 90.0, size.x - 90.0)
-	var fire_interval: float = max(BOSS_FIRE_INTERVAL_BASE - float(_zone_index) * 0.12, BOSS_FIRE_INTERVAL_MIN)
+	if _boss_charging:
+		_boss_charge_timer -= delta
+		if _boss_sprite != null:
+			var pulse: float = 0.5 + 0.5 * sin(_elapsed * 22.0)
+			_boss_sprite.modulate = Color(1.0, 1.0 - pulse * 0.55, 1.0 - pulse * 0.65, 1.0)
+		if _boss_charge_timer <= 0.0:
+			_boss_charging = false
+			if _boss_sprite != null: _boss_sprite.modulate = Color.WHITE
+			_fire_pattern_ultimate()
+			_boss_fire_timer = max(BOSS_FIRE_INTERVAL_BASE - float(_zone_index) * 0.12, BOSS_FIRE_INTERVAL_MIN)
+		return
+	var phase_bonus: float = float(_boss_phase - 1) * 0.22
+	var fire_interval: float = max(BOSS_FIRE_INTERVAL_BASE - float(_zone_index) * 0.12 - phase_bonus, BOSS_FIRE_INTERVAL_MIN)
 	_boss_fire_timer -= delta
 	if _boss_fire_timer <= 0.0:
 		_boss_fire_timer = fire_interval
-		_fire_boss_pattern()
+		# Phase 3 : toutes les 4 salves, le gardien charge une attaque
+		# telegraphee (pulsation rouge ~0.9s) avant de lacher une salve
+		# circulaire complete -- lisible et evitable si le joueur reagit.
+		if _boss_phase >= 3 and _boss_pattern_step > 0 and _boss_pattern_step % 4 == 0:
+			_boss_charging = true; _boss_charge_timer = 0.9
+			Audio.play_sfx("alarm")
+			_boss_pattern_step += 1
+		else:
+			_fire_boss_pattern()
+
+
+func _check_boss_phase_transition(hp_fraction: float) -> void:
+	var new_phase: int = 1
+	if hp_fraction <= 0.33: new_phase = 3
+	elif hp_fraction <= 0.66: new_phase = 2
+	if new_phase != _boss_phase:
+		_boss_phase = new_phase
+		_boss_fire_timer = min(_boss_fire_timer, 0.5)
+		_spawn_floating_text(_boss.position, Settings.loc("boss_phase_alert"), Color("#ff6b6b"))
+		if not Settings.reduce_motion: _shake(0.2, 5.0)
+		Audio.play_sfx("alarm")
 
 
 func _fire_boss_pattern() -> void:
 	if _boss == null or not is_instance_valid(_boss): return
 	_boss_pattern_step += 1
+	# Le pattern de base depend de la zone ; a partir de la phase 2, le
+	# gardien enrichit sa salve avec un second pattern en surimpression
+	# pour une difficulte croissante au fil du combat (pas seulement de la zone).
 	match _zone_index % 5:
 		0: _fire_pattern_spread()
 		1: _fire_pattern_rotating()
@@ -3461,6 +3500,23 @@ func _fire_boss_pattern() -> void:
 		3: _fire_pattern_aimed_burst()
 		4: _fire_pattern_spiral()
 		_: _fire_pattern_spread()
+	if _boss_phase >= 2:
+		match (_zone_index + 1) % 5:
+			0: _fire_pattern_spread()
+			1: _fire_pattern_rotating()
+			2: _fire_pattern_aimed_burst()
+			3: _fire_pattern_spiral()
+			4: _fire_pattern_aimed_burst()
+			_: _fire_pattern_aimed_burst()
+
+
+func _fire_pattern_ultimate() -> void:
+	if _boss == null or not is_instance_valid(_boss): return
+	Audio.play_sfx("boom")
+	var count: int = 14
+	for i in range(count):
+		var angle_t: float = float(i) / float(count)
+		_fire_enemy_bullet(_boss.position, lerpf(-150.0, 150.0, angle_t))
 
 
 func _fire_pattern_spread() -> void:
@@ -3506,7 +3562,9 @@ func _damage_boss(dmg: float) -> void:
 	var hp: float = float(_boss.get_meta("hp")) - dmg
 	_boss.set_meta("hp", max(hp, 0.0))
 	_update_boss_bar()
-	if _boss_sprite != null: _flash_hit(_boss_sprite, Color.WHITE)
+	var max_hp: float = float(_boss.get_meta("max_hp"))
+	if max_hp > 0.0: _check_boss_phase_transition(max(hp, 0.0) / max_hp)
+	if _boss_sprite != null and not _boss_charging: _flash_hit(_boss_sprite, Color.WHITE)
 	_spawn_burst(_boss.position + Vector2(_rng.randf_range(-24.0, 24.0), _rng.randf_range(-16.0, 16.0)), Color("#ffdf6b"))
 	if hp <= 0.0:
 		_defeat_boss()

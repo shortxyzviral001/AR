@@ -150,6 +150,8 @@ const TRANSLATIONS: Dictionary = {
 		"hud_time": "Temps  %ds",
 		# Combo HUD
 		"combo_label": "COMBO",
+		# Boss phases
+		"boss_phase_alert": "Rage du Gardien !",
 		# Power-ups
 		"powerup_shield": "Bouclier !",
 		"powerup_speed": "Vitesse + !",
@@ -370,6 +372,8 @@ const TRANSLATIONS: Dictionary = {
 		"hud_time": "Time  %ds",
 		# Combo HUD
 		"combo_label": "COMBO",
+		# Boss phases
+		"boss_phase_alert": "Guardian's Rage!",
 		# Power-ups
 		"powerup_shield": "Shield !",
 		"powerup_speed": "Speed + !",
